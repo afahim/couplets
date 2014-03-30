@@ -71,27 +71,14 @@ public:
 	bool puppetMode;
 	ofVec3f cameraOffset;
 
-	float lowerLegLen;
-	float upperLegLen;
-	float footXOffset;
-	float legForwardness;
-	float kneeRotRadius;
-	float kneeRotYness;
-	float footRotRadius;
-	float footRotTimeOffset;
-
-	ofVec2f kneeCenter;
-	ofVec2f footCenter;
-	ofVec2f kneePoint;
-	ofVec2f footPoint;
-
-	float spinSpeed;
-
 	bool drawIDs;
 	bool drawMesh;
 	bool drawCtrlpoints;
     
     ofVideoGrabber cam;
-	ofxFaceTracker tracker;
-
+	ofxFaceTracker tracker, imgTracker;
+    
+    bool isInitFrame = true;
+    vector<ofPoint> diffLeftEye;
+    vector<ofPoint> diffRightEye;
 };

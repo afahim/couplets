@@ -129,30 +129,16 @@ void ofApp::setup(){
 	//puppet.setControlPoint(9); // pin the top right
 	puppet.setEvents(false);
 
-	legImg.loadImage("leg.png");
-    legImg.resize(ofGetWidth(), ofGetHeight());
+    imgTracker.setup();
+    legImg.loadImage("leg.png");
+    //legImg.resize(ofGetWidth(), ofGetHeight());
 
+    imgTracker.update(ofxCv::toCv(legImg));
+    
 	draggingVertex = false;
 	puppetMode = false;
 
 	OFX_REMOTEUI_SERVER_SETUP(10000);
-
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(upperLegLen, 100, 500);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(lowerLegLen, 100, 500);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(legForwardness, -100, 500);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(footXOffset, -200, 200);
-
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(spinSpeed, -10, 10);
-
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(kneeRotRadius, 0, 150);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(kneeRotYness, 0.3, 1.5);
-
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(footRotRadius, 0, 150);
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(footRotTimeOffset, -5, 5);
 
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
@@ -163,6 +149,7 @@ void ofApp::setup(){
     
     cam.initGrabber(1280, 720);
 	tracker.setup();
+    
 }
 
 void ofApp::update(){
@@ -172,23 +159,40 @@ void ofApp::update(){
 	puppet.setScreenOffset(cameraOffset);
 	puppet.update();
 
-	vector<int> ids = puppet.getControlPointIDs();
-    
+	vector<int> ids = puppet.getControlPointIDs();    
     cam.update();
-	if(cam.isFrameNew() && ids.size() > 9) {
+	if(cam.isFrameNew() && ids.size() > 11) {
 		tracker.update(ofxCv::toCv(cam));
         if (tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices().size() > 4){
-            puppet.setControlPoint(ids[0], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[0]);
-            puppet.setControlPoint(ids[1], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[1]);
-            puppet.setControlPoint(ids[2], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[2]);
-            puppet.setControlPoint(ids[3], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[3]);
-            puppet.setControlPoint(ids[4], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[4]);
+            if (isInitFrame){
+
+                for (int i = 0; i < 5; i++) {
+                    ofPoint p = tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i] - imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i];
+                    diffLeftEye.push_back(p);
+                }
+                for (int i = 0; i < 5; i++) {
+                    ofPoint p = tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i] - imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i];
+                    diffRightEye.push_back(p);
+                }
+                isInitFrame = false;
+            }
             
-            puppet.setControlPoint(ids[5], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[0]);
-            puppet.setControlPoint(ids[6], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[1]);
-            puppet.setControlPoint(ids[7], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[2]);
-            puppet.setControlPoint(ids[8], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[3]);
-            puppet.setControlPoint(ids[9], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[4]);
+//            puppet.setControlPoint(2, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[0] );
+//            puppet.setControlPoint(3, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[1] );
+//            puppet.setControlPoint(4, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[2] );
+//            puppet.setControlPoint(5, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[3] );
+//            puppet.setControlPoint(6, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[4] );
+//            
+//            puppet.setControlPoint(7, tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3]);
+//            puppet.setControlPoint(8, tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2]);
+//            
+//            puppet.setControlPoint(9, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[0] );
+//            puppet.setControlPoint(10, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[1] );
+//            puppet.setControlPoint(11, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[2] );
+//            puppet.setControlPoint(12, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[3] );
+//            puppet.setControlPoint(13, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[4] );
+
+
         }
 
 	}
@@ -216,13 +220,6 @@ void ofApp::draw(){
 		ofNoFill();
 		ofSetColor(0);
 		ofPushMatrix();
-		//ofTranslate(kneeCenter);
-			//ofScale(1, kneeRotYness);
-			//ofCircle(0,0, kneeRotRadius);
-			//ofCircle(0,0, 1);
-		//ofPopMatrix();
-		//ofCircle(footCenter.x, footCenter.y, footRotRadius);
-		//ofCircle(footCenter.x, footCenter.y, 1);
 		ofFill();
 	}
 
@@ -289,7 +286,10 @@ void ofApp::draw(){
     //cam.draw(0, 0);
 	ofSetLineWidth(2);
 	tracker.getImageFeature(tracker.LEFT_EYEBROW).draw();
+    tracker.getImageFeature(tracker.RIGHT_EYEBROW).draw();
 	ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
+    
+    imgTracker.draw();
 
 }
 
@@ -371,32 +371,45 @@ void ofApp::keyPressed( int key ){
 	ITRIANGLE zero;
 
 	switch(key){
+            
+        case 'i': {
+            tri.addPoint(0, 0, 0);
+            tri.triangulate();
+            tri.addPoint(0, legImg.getHeight(), 0);
+            tri.triangulate();
+            tri.addPoint(legImg.getWidth(), 0, 0);
+            tri.triangulate();
+            tri.addPoint(legImg.getWidth(), legImg.getHeight(), 0);
+            tri.triangulate();
 
-		case 's': saveMesh(tri, selectedTriangles); break;
-		case 'l': loadMesh(tri, selectedTriangles); tri.triangulate(); break;
-		case 'c': clear(); selectedTriangles.clear();break;
-		case 'C':{
-			selectedTriangles.clear();
-		} break;
 
-		case 'a':{
-			ITRIANGLE ti = tri.getTriangleForPos(ofVec2f(mouseX - cameraOffset.x,mouseY - cameraOffset.y));
+            
 
-			if (ti != zero){
-				if(!triangleInVector(selectedTriangles, ti)){ //not in current selection, add
-					selectedTriangles.push_back(ti);
-				}else{ //already in selection, remove from selection
-					for(int i = 0; i < selectedTriangles.size(); i++){
-						if (selectedTriangles[i] == ti){
-							selectedTriangles.erase(selectedTriangles.begin()+i);
-							break;
-						}
-					}
-				}
-			}
-		}break;
+            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).size(); i++) {
+                tri.addPoint(imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i][1], 0);
+                tri.triangulate();
+            }
+            
+            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).size(); i++) {
+                tri.addPoint(imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i][1], 0);
+                tri.triangulate();
+            }
+            
+            for (int i = 2; i < imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).size(); i++) {
+                tri.addPoint(imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).getVertices()[i][1], 0);
+                tri.triangulate();                
+            }
 
-		case 'A':{//select ALL triangles
+            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.INNER_MOUTH).size(); i++) {
+                tri.addPoint(imgTracker.getImageFeature(imgTracker.INNER_MOUTH).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.INNER_MOUTH).getVertices()[i][1], 0);
+                tri.triangulate();
+            }
+            
+            selectedTriangles.clear();
+        }
+        break;
+
+		case 'o':{//select ALL triangles
 				selectedTriangles.clear();
 				int nTri = tri.getNumTriangles();
 				for(int i = 0; i < nTri ; i++){
@@ -412,6 +425,11 @@ void ofApp::keyPressed( int key ){
 			clear();
 			puppetMode = true;
 			puppet.setEvents(true);
+            
+            for(int i = 2; i < 14; i++){
+                puppet.setControlPoint(i);
+            }
+
 			break;
 	}
 }
