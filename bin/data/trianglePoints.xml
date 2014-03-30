@@ -1,0 +1,95 @@
+<meshPoint x="-147.000000" y="278.000000"></meshPoint>
+<meshPoint x="-8.000000" y="61.000000"></meshPoint>
+<meshPoint x="5.000000" y="102.000000"></meshPoint>
+<meshPoint x="22.000000" y="45.000000"></meshPoint>
+<meshPoint x="37.000000" y="145.000000"></meshPoint>
+<meshPoint x="76.000000" y="97.000000"></meshPoint>
+<meshPoint x="77.000000" y="494.000000"></meshPoint>
+<meshPoint x="80.000000" y="34.000000"></meshPoint>
+<meshPoint x="91.000000" y="464.000000"></meshPoint>
+<meshPoint x="95.000000" y="192.000000"></meshPoint>
+<meshPoint x="108.000000" y="433.000000"></meshPoint>
+<meshPoint x="113.000000" y="390.000000"></meshPoint>
+<meshPoint x="120.000000" y="529.000000"></meshPoint>
+<meshPoint x="122.000000" y="358.000000"></meshPoint>
+<meshPoint x="123.000000" y="358.000000"></meshPoint>
+<meshPoint x="124.000000" y="230.000000"></meshPoint>
+<meshPoint x="131.000000" y="492.000000"></meshPoint>
+<meshPoint x="139.000000" y="304.000000"></meshPoint>
+<meshPoint x="145.000000" y="249.000000"></meshPoint>
+<meshPoint x="146.000000" y="140.000000"></meshPoint>
+<meshPoint x="147.000000" y="417.000000"></meshPoint>
+<meshPoint x="148.000000" y="276.000000"></meshPoint>
+<meshPoint x="152.000000" y="38.000000"></meshPoint>
+<meshPoint x="167.000000" y="356.000000"></meshPoint>
+<meshPoint x="173.000000" y="192.000000"></meshPoint>
+<meshPoint x="173.000000" y="55.000000"></meshPoint>
+<meshPoint x="174.000000" y="566.000000"></meshPoint>
+<meshPoint x="181.000000" y="464.000000"></meshPoint>
+<meshPoint x="183.000000" y="529.000000"></meshPoint>
+<meshPoint x="186.000000" y="277.000000"></meshPoint>
+<meshPoint x="186.000000" y="88.000000"></meshPoint>
+<meshPoint x="191.000000" y="397.000000"></meshPoint>
+<meshPoint x="198.000000" y="121.000000"></meshPoint>
+<meshPoint x="207.000000" y="245.000000"></meshPoint>
+<meshPoint x="212.000000" y="328.000000"></meshPoint>
+<meshPoint x="214.000000" y="507.000000"></meshPoint>
+<meshPoint x="216.000000" y="156.000000"></meshPoint>
+<meshPoint x="218.000000" y="561.000000"></meshPoint>
+<meshPoint x="230.000000" y="280.000000"></meshPoint>
+<meshPoint x="243.000000" y="539.000000"></meshPoint>
+<meshPoint x="245.000000" y="218.000000"></meshPoint>
+<meshPoint x="248.000000" y="246.000000"></meshPoint>
+<meshPoint x="269.000000" y="9.000000"></meshPoint>
+<meshPoint x="347.000000" y="135.000000"></meshPoint>
+<meshPoint x="356.000000" y="402.000000"></meshPoint>
+<SelectionTriangleIndex p1="1" p2="2" p3="3"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="3" p2="5" p3="7"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="2" p2="4" p3="5"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="3" p2="2" p3="5"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="8" p2="10" p3="11"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="17" p2="14" p3="23"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="5" p2="4" p3="9"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="40" p2="33" p3="41"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="35" p2="28" p3="37"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="13" p2="11" p3="14"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="10" p2="8" p3="16"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="8" p2="6" p3="16"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="6" p2="12" p3="16"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="10" p2="16" p3="20"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="27" p2="16" p3="28"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="13" p2="14" p3="17"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="7" p2="5" p3="22"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="11" p2="20" p3="23"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="5" p2="9" p3="19"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="11" p2="10" p3="20"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="12" p2="26" p3="28"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="14" p2="11" p3="23"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="33" p2="38" p3="41"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="22" p2="5" p3="25"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="15" p2="18" p3="24"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="9" p2="15" p3="24"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="19" p2="9" p3="24"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="16" p2="12" p3="28"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="5" p2="19" p3="25"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="32" p2="19" p3="36"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="20" p2="16" p3="27"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="25" p2="19" p3="30"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="27" p2="28" p3="35"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="30" p2="19" p3="32"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="18" p2="21" p3="29"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="21" p2="17" p3="29"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="19" p2="24" p3="36"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="18" p2="29" p3="33"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="23" p2="20" p3="31"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="20" p2="27" p3="31"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="35" p2="37" p3="39"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="24" p2="18" p3="33"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="23" p2="31" p3="34"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="17" p2="23" p3="34"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="29" p2="17" p3="34"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="24" p2="33" p3="40"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="28" p2="26" p3="37"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="36" p2="24" p3="40"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="33" p2="29" p3="38"></SelectionTriangleIndex>
+<SelectionTriangleIndex p1="29" p2="34" p3="38"></SelectionTriangleIndex>
