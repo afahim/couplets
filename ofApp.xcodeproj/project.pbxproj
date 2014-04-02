@@ -8,10 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		169d3c72fde6c5590a1616f500a456b4 /* ofxCvFloatImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7b6a03390302d5a2c9f0e4ab630ae8d6 /* ofxCvFloatImage.cpp */; };
-		1C530DCB18E4D7AA006016D7 /* ofxModifierKeys_impl_linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DC018E4D7AA006016D7 /* ofxModifierKeys_impl_linux.cpp */; };
-		1C530DCC18E4D7AA006016D7 /* ofxModifierKeys_impl_mac.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DC118E4D7AA006016D7 /* ofxModifierKeys_impl_mac.mm */; };
-		1C530DCD18E4D7AA006016D7 /* ofxModifierKeys_impl_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DC218E4D7AA006016D7 /* ofxModifierKeys_impl_win.cpp */; };
-		1C530DDE18E4D7DC006016D7 /* ofxTimeMeasurements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DDA18E4D7DC006016D7 /* ofxTimeMeasurements.cpp */; };
 		1C530DFA18E4D7F1006016D7 /* Delaunay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DED18E4D7F1006016D7 /* Delaunay.cpp */; };
 		1C530DFB18E4D7F1006016D7 /* ofxDelaunay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DF118E4D7F1006016D7 /* ofxDelaunay.cpp */; };
 		1C530EDD18E4DA43006016D7 /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530E9E18E4DA43006016D7 /* ofxRemoteUI.cpp */; };
@@ -143,25 +139,10 @@
 		096cb33cad6c5a446e7026e9ff234dc2 /* dynamic_bitset.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = dynamic_bitset.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/dynamic_bitset.h; sourceTree = SOURCE_ROOT; };
 		0cf0aa3895d28e97d8a1e4a938976234 /* ground_truth.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ground_truth.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/ground_truth.h; sourceTree = SOURCE_ROOT; };
 		114b872696817cc33990fc83feb1259e /* imgproc.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = imgproc.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc.hpp; sourceTree = SOURCE_ROOT; };
-		1C530DAC18E4D7AA006016D7 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		1C530DBF18E4D7AA006016D7 /* ofxModifierKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxModifierKeys.h; sourceTree = "<group>"; };
-		1C530DC018E4D7AA006016D7 /* ofxModifierKeys_impl_linux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxModifierKeys_impl_linux.cpp; sourceTree = "<group>"; };
-		1C530DC118E4D7AA006016D7 /* ofxModifierKeys_impl_mac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxModifierKeys_impl_mac.mm; sourceTree = "<group>"; };
-		1C530DC218E4D7AA006016D7 /* ofxModifierKeys_impl_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxModifierKeys_impl_win.cpp; sourceTree = "<group>"; };
-		1C530DD618E4D7DC006016D7 /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
-		1C530DD718E4D7DC006016D7 /* ofxaddons_thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ofxaddons_thumbnail.png; sourceTree = "<group>"; };
-		1C530DD818E4D7DC006016D7 /* ReadMe.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.md; sourceTree = "<group>"; };
-		1C530DDA18E4D7DC006016D7 /* ofxTimeMeasurements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTimeMeasurements.cpp; sourceTree = "<group>"; };
-		1C530DDB18E4D7DC006016D7 /* ofxTimeMeasurements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTimeMeasurements.h; sourceTree = "<group>"; };
-		1C530DE018E4D7F1006016D7 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		1C530DED18E4D7F1006016D7 /* Delaunay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Delaunay.cpp; sourceTree = "<group>"; };
 		1C530DEE18E4D7F1006016D7 /* Delaunay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delaunay.h; sourceTree = "<group>"; };
-		1C530DEF18E4D7F1006016D7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		1C530DF118E4D7F1006016D7 /* ofxDelaunay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxDelaunay.cpp; sourceTree = "<group>"; };
 		1C530DF218E4D7F1006016D7 /* ofxDelaunay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxDelaunay.h; sourceTree = "<group>"; };
-		1C530E1418E4DA43006016D7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		1C530E5C18E4DA43006016D7 /* ofxaddons_thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ofxaddons_thumbnail.png; sourceTree = "<group>"; };
-		1C530E9B18E4DA43006016D7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		1C530E9D18E4DA43006016D7 /* dirent_vs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dirent_vs.h; sourceTree = "<group>"; };
 		1C530E9E18E4DA43006016D7 /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		1C530E9F18E4DA43006016D7 /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
@@ -174,7 +155,6 @@
 		1C530EA618E4DA43006016D7 /* ofxRemoteUISimpleNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUISimpleNotifications.h; sourceTree = "<group>"; };
 		1C530EA718E4DA43006016D7 /* RemoteParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteParam.h; sourceTree = "<group>"; };
 		1C530EA818E4DA43006016D7 /* uriencode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
-		1C530F7C18E4DE7E006016D7 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		1C53102F18E4DE7E006016D7 /* license.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.md; sourceTree = "<group>"; };
 		1C53103118E4DE7E006016D7 /* face.con */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = face.con; sourceTree = "<group>"; };
 		1C53103218E4DE7E006016D7 /* face.tracker */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = face.tracker; sourceTree = "<group>"; };
@@ -188,9 +168,6 @@
 		1C53103C18E4DE7E006016D7 /* PAW.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PAW.cc; sourceTree = "<group>"; };
 		1C53103D18E4DE7E006016D7 /* PDM.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PDM.cc; sourceTree = "<group>"; };
 		1C53103E18E4DE7E006016D7 /* Tracker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tracker.cc; sourceTree = "<group>"; };
-		1C53103F18E4DE7E006016D7 /* license.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.md; sourceTree = "<group>"; };
-		1C53104018E4DE7E006016D7 /* ofxaddons_thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ofxaddons_thumbnail.png; sourceTree = "<group>"; };
-		1C53104118E4DE7E006016D7 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.md; sourceTree = "<group>"; };
 		1C53104318E4DE7E006016D7 /* Expression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Expression.cpp; sourceTree = "<group>"; };
 		1C53104418E4DE7E006016D7 /* Expression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Expression.h; sourceTree = "<group>"; };
 		1C53104518E4DE7E006016D7 /* ExpressionClassifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExpressionClassifier.cpp; sourceTree = "<group>"; };
@@ -198,7 +175,6 @@
 		1C53104718E4DE7E006016D7 /* ofxFaceTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxFaceTracker.cpp; sourceTree = "<group>"; };
 		1C53104818E4DE7E006016D7 /* ofxFaceTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxFaceTracker.h; sourceTree = "<group>"; };
 		1C53104918E4DE7E006016D7 /* ofxFaceTrackerThreaded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxFaceTrackerThreaded.h; sourceTree = "<group>"; };
-		1C53104A18E4DE7E006016D7 /* update-projects.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "update-projects.py"; sourceTree = "<group>"; };
 		1C5310B318E4DF2B006016D7 /* CLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLM.h; sourceTree = "<group>"; };
 		1C5310B418E4DF2B006016D7 /* FCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FCheck.h; sourceTree = "<group>"; };
 		1C5310B518E4DF2B006016D7 /* FDet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FDet.h; sourceTree = "<group>"; };
@@ -207,7 +183,6 @@
 		1C5310B818E4DF2B006016D7 /* PAW.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAW.h; sourceTree = "<group>"; };
 		1C5310B918E4DF2B006016D7 /* PDM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PDM.h; sourceTree = "<group>"; };
 		1C5310BA18E4DF2B006016D7 /* Tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tracker.h; sourceTree = "<group>"; };
-		1C5310BC18E4DF82006016D7 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		1C5312F218E4DF82006016D7 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		1C5312F618E4DF82006016D7 /* ETF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETF.h; sourceTree = "<group>"; };
 		1C5312F718E4DF82006016D7 /* fdog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fdog.h; sourceTree = "<group>"; };
@@ -225,11 +200,7 @@
 		1C53131218E4DF82006016D7 /* Tracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tracker.cpp; sourceTree = "<group>"; };
 		1C53131318E4DF82006016D7 /* Utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
 		1C53131418E4DF82006016D7 /* Wrappers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Wrappers.cpp; sourceTree = "<group>"; };
-		1C53131518E4DF82006016D7 /* license.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = license.md; sourceTree = "<group>"; };
-		1C53131618E4DF82006016D7 /* ofxaddons_thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ofxaddons_thumbnail.png; sourceTree = "<group>"; };
-		1C53131718E4DF82006016D7 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.md; sourceTree = "<group>"; };
 		1C53131918E4DF82006016D7 /* ofxCv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxCv.h; sourceTree = "<group>"; };
-		1C53131A18E4DF82006016D7 /* update-projects.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "update-projects.py"; sourceTree = "<group>"; };
 		1C53145218E4E0BE006016D7 /* Calibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Calibration.h; sourceTree = "<group>"; };
 		1C53145318E4E0BE006016D7 /* ContourFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContourFinder.h; sourceTree = "<group>"; };
 		1C53145418E4E0BE006016D7 /* Distance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Distance.h; sourceTree = "<group>"; };
@@ -514,54 +485,10 @@
 			name = contrib;
 			sourceTree = "<group>";
 		};
-		1C530DAB18E4D7AA006016D7 /* ofxModifierKeys */ = {
-			isa = PBXGroup;
-			children = (
-				1C530DAC18E4D7AA006016D7 /* .gitignore */,
-				1C530DBE18E4D7AA006016D7 /* src */,
-			);
-			name = ofxModifierKeys;
-			path = ../../ofxModifierKeys;
-			sourceTree = "<group>";
-		};
-		1C530DBE18E4D7AA006016D7 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				1C530DBF18E4D7AA006016D7 /* ofxModifierKeys.h */,
-				1C530DC018E4D7AA006016D7 /* ofxModifierKeys_impl_linux.cpp */,
-				1C530DC118E4D7AA006016D7 /* ofxModifierKeys_impl_mac.mm */,
-				1C530DC218E4D7AA006016D7 /* ofxModifierKeys_impl_win.cpp */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		1C530DD118E4D7DC006016D7 /* ofxTimeMeasurements */ = {
-			isa = PBXGroup;
-			children = (
-				1C530DD618E4D7DC006016D7 /* install.xml */,
-				1C530DD718E4D7DC006016D7 /* ofxaddons_thumbnail.png */,
-				1C530DD818E4D7DC006016D7 /* ReadMe.md */,
-				1C530DD918E4D7DC006016D7 /* src */,
-			);
-			name = ofxTimeMeasurements;
-			path = ../../ofxTimeMeasurements;
-			sourceTree = "<group>";
-		};
-		1C530DD918E4D7DC006016D7 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				1C530DDA18E4D7DC006016D7 /* ofxTimeMeasurements.cpp */,
-				1C530DDB18E4D7DC006016D7 /* ofxTimeMeasurements.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		1C530DDF18E4D7F1006016D7 /* ofxDelaunay */ = {
 			isa = PBXGroup;
 			children = (
-				1C530DE018E4D7F1006016D7 /* .gitignore */,
 				1C530DEB18E4D7F1006016D7 /* libs */,
-				1C530DEF18E4D7F1006016D7 /* README.md */,
 				1C530DF018E4D7F1006016D7 /* src */,
 			);
 			name = ofxDelaunay;
@@ -597,9 +524,6 @@
 		1C530DFF18E4DA43006016D7 /* ofxRemoteUI */ = {
 			isa = PBXGroup;
 			children = (
-				1C530E1418E4DA43006016D7 /* LICENSE */,
-				1C530E5C18E4DA43006016D7 /* ofxaddons_thumbnail.png */,
-				1C530E9B18E4DA43006016D7 /* README.md */,
 				1C530E9C18E4DA43006016D7 /* src */,
 			);
 			name = ofxRemoteUI;
@@ -628,13 +552,8 @@
 		1C530F7B18E4DE7E006016D7 /* ofxFaceTracker */ = {
 			isa = PBXGroup;
 			children = (
-				1C530F7C18E4DE7E006016D7 /* .gitignore */,
 				1C53102318E4DE7E006016D7 /* libs */,
-				1C53103F18E4DE7E006016D7 /* license.md */,
-				1C53104018E4DE7E006016D7 /* ofxaddons_thumbnail.png */,
-				1C53104118E4DE7E006016D7 /* readme.md */,
 				1C53104218E4DE7E006016D7 /* src */,
-				1C53104A18E4DE7E006016D7 /* update-projects.py */,
 			);
 			name = ofxFaceTracker;
 			path = ../../ofxFaceTracker;
@@ -725,13 +644,8 @@
 		1C5310BB18E4DF82006016D7 /* ofxCv */ = {
 			isa = PBXGroup;
 			children = (
-				1C5310BC18E4DF82006016D7 /* .gitignore */,
 				1C5312F118E4DF82006016D7 /* libs */,
-				1C53131518E4DF82006016D7 /* license.md */,
-				1C53131618E4DF82006016D7 /* ofxaddons_thumbnail.png */,
-				1C53131718E4DF82006016D7 /* readme.md */,
 				1C53131818E4DF82006016D7 /* src */,
-				1C53131A18E4DF82006016D7 /* update-projects.py */,
 			);
 			path = ofxCv;
 			sourceTree = "<group>";
@@ -1058,8 +972,6 @@
 				1C530F7B18E4DE7E006016D7 /* ofxFaceTracker */,
 				1C530DFF18E4DA43006016D7 /* ofxRemoteUI */,
 				1C530DDF18E4D7F1006016D7 /* ofxDelaunay */,
-				1C530DD118E4D7DC006016D7 /* ofxTimeMeasurements */,
-				1C530DAB18E4D7AA006016D7 /* ofxModifierKeys */,
 				BBA5340217D6735B00200A30 /* ofxOsc */,
 				BB68F1DC17CFA0C7009A8A93 /* ofxXmlSettings */,
 				2745E4061749B96C00A2F3A3 /* ofxPuppet */,
@@ -1505,10 +1417,6 @@
 				BBA5343817D6735B00200A30 /* ofxOscParameterSync.cpp in Sources */,
 				BBA5343917D6735B00200A30 /* ofxOscReceiver.cpp in Sources */,
 				BBA5343A17D6735B00200A30 /* ofxOscSender.cpp in Sources */,
-				1C530DCB18E4D7AA006016D7 /* ofxModifierKeys_impl_linux.cpp in Sources */,
-				1C530DCC18E4D7AA006016D7 /* ofxModifierKeys_impl_mac.mm in Sources */,
-				1C530DCD18E4D7AA006016D7 /* ofxModifierKeys_impl_win.cpp in Sources */,
-				1C530DDE18E4D7DC006016D7 /* ofxTimeMeasurements.cpp in Sources */,
 				1C530DFA18E4D7F1006016D7 /* Delaunay.cpp in Sources */,
 				1C530DFB18E4D7F1006016D7 /* ofxDelaunay.cpp in Sources */,
 				1C530EDD18E4DA43006016D7 /* ofxRemoteUI.cpp in Sources */,

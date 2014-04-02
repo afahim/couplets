@@ -4,18 +4,13 @@
 #include "ofxPuppetInteractive.h"
 #include "ofxDelaunay.h"
 #include "ofxXmlSettings.h"
-#include "ofxTimeMeasurements.h"
-#include "ofxModifierKeys.h"
 #include "ofxRemoteUIServer.h"
-
 #include "ofxCv.h"
 #include "ofxFaceTracker.h"
 
 #define XML_TAG_POINT_NAME					"meshPoint"
 #define XML_TAG_SELECTION_TRIANGLE_NAME		"SelectionTriangleIndex"
-
 #define MESH_XML_FILENAME					"trianglePoints.xml"
-
 #define SELECTION_DISTANCE					13
 
 struct Triangle{
@@ -74,11 +69,20 @@ public:
 	bool drawIDs;
 	bool drawMesh;
 	bool drawCtrlpoints;
+    bool isInit = true;
     
     ofVideoGrabber cam;
-	ofxFaceTracker tracker, imgTracker;
+	ofxFaceTracker tracker;//, imgTracker;
+
+    int numClicks;
+        
+    vector<ofPoint> initLeftEye;
+    vector<ofPoint> initRightEye;
+    vector<ofPoint> initNose;
+    vector<ofPoint> initMouth;
     
-    bool isInitFrame = true;
     vector<ofPoint> diffLeftEye;
     vector<ofPoint> diffRightEye;
+    vector<ofPoint> diffNose;
+    vector<ofPoint> diffMouth;
 };

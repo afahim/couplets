@@ -112,44 +112,34 @@ void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, vector<I
 		m.addIndex(*t.p1); m.addIndex(*t.p2); m.addIndex(*t.p3);
 	}
 
-
 	pup.setup(m);
 	tri.reset();
-
 	free(indexTable);
 }
 
 
 void ofApp::setup(){
 	ofSetVerticalSync(true);
-	//ofMesh mesh = makeGrid(ofRectangle(100,100,600,600), 5, 5);
-	//puppet.setup(mesh); //do this when presssing 'p' now
-
-	//puppet.setControlPoint(0); // pin the top left
-	//puppet.setControlPoint(9); // pin the top right
 	puppet.setEvents(false);
 
-    imgTracker.setup();
-    legImg.loadImage("leg.png");
-    //legImg.resize(ofGetWidth(), ofGetHeight());
-
-    imgTracker.update(ofxCv::toCv(legImg));
+    //imgTracker.setup();
+    legImg.loadImage("picture.png");
+    legImg.resize(legImg.getWidth()/3, legImg.getHeight()/3);
+    
+    //imgTracker.update(ofxCv::toCv(legImg));
     
 	draggingVertex = false;
 	puppetMode = false;
 
-	OFX_REMOTEUI_SERVER_SETUP(10000);
-
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawMesh);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawCtrlpoints);
-
-	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
+//	OFX_REMOTEUI_SERVER_SETUP(10000);
+//	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
+//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
+//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawMesh);
+//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawCtrlpoints);
+//	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
     
     cam.initGrabber(1280, 720);
 	tracker.setup();
-    
 }
 
 void ofApp::update(){
@@ -161,38 +151,59 @@ void ofApp::update(){
 
 	vector<int> ids = puppet.getControlPointIDs();    
     cam.update();
-	if(cam.isFrameNew() && ids.size() > 11) {
+	if(cam.isFrameNew() && ids.size() > 0) {
 		tracker.update(ofxCv::toCv(cam));
-        if (tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices().size() > 4){
-            if (isInitFrame){
-
+        if (tracker.getFound()){
+            
+            if (isInit) {
                 for (int i = 0; i < 5; i++) {
-                    ofPoint p = tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i] - imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i];
+                    ofPoint p = tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i] - initLeftEye[i];
                     diffLeftEye.push_back(p);
                 }
+                
                 for (int i = 0; i < 5; i++) {
-                    ofPoint p = tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i] - imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i];
+                    ofPoint p = tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i] - initRightEye[i];
                     diffRightEye.push_back(p);
                 }
-                isInitFrame = false;
+                
+                for (int i = 2; i < 4; i++) {
+                    ofPoint p = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[i] - initNose[i - 2];
+                    diffNose.push_back(p);
+                }
+                isInit = false;
             }
+            for (int i = 0; i < 12; i++) {
+                ofPoint p = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[i] - initMouth[i];
+                diffMouth.push_back(p);
+            }
+            puppet.setControlPoint(0,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[0] - diffLeftEye[0]);
+            puppet.setControlPoint(1,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[1] - diffLeftEye[1]);
+            puppet.setControlPoint(2,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[2] - diffLeftEye[2]);
+            puppet.setControlPoint(3,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[3] - diffLeftEye[3]);
+            puppet.setControlPoint(4,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[4] - diffLeftEye[4]);
             
-//            puppet.setControlPoint(2, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[0] );
-//            puppet.setControlPoint(3, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[1] );
-//            puppet.setControlPoint(4, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[2] );
-//            puppet.setControlPoint(5, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[3] );
-//            puppet.setControlPoint(6, tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[4] );
-//            
-//            puppet.setControlPoint(7, tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3]);
-//            puppet.setControlPoint(8, tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2]);
-//            
-//            puppet.setControlPoint(9, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[0] );
-//            puppet.setControlPoint(10, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[1] );
-//            puppet.setControlPoint(11, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[2] );
-//            puppet.setControlPoint(12, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[3] );
-//            puppet.setControlPoint(13, tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[4] );
-
-
+            puppet.setControlPoint(5,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[0] - diffRightEye[0]);
+            puppet.setControlPoint(6,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[1] - diffRightEye[1]);
+            puppet.setControlPoint(7,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[2] - diffRightEye[2]);
+            puppet.setControlPoint(8,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[3] - diffRightEye[3]);
+            puppet.setControlPoint(9,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[4] - diffRightEye[4]);
+            
+            puppet.setControlPoint(10,  tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2] - diffNose[0]);
+            puppet.setControlPoint(11,  tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3] - diffNose[1]);
+            
+            puppet.setControlPoint(12,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[0] - diffMouth[0]);
+            puppet.setControlPoint(13,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[1] - diffMouth[1]);
+            puppet.setControlPoint(14,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2] - diffMouth[2]);
+            puppet.setControlPoint(15,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3] - diffMouth[3]);
+            puppet.setControlPoint(16,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4] - diffMouth[4]);
+            puppet.setControlPoint(17,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[5] - diffMouth[5]);
+            puppet.setControlPoint(18,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[6] - diffMouth[6]);
+            puppet.setControlPoint(19,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[7] - diffMouth[7]);
+            puppet.setControlPoint(20,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[8] - diffMouth[8]);
+            puppet.setControlPoint(21,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9] - diffMouth[9]);
+            puppet.setControlPoint(22,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[10] - diffMouth[10]);
+            puppet.setControlPoint(23,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[11] - diffMouth[11]);
+        
         }
 
 	}
@@ -226,7 +237,7 @@ void ofApp::draw(){
 
 	ofSetColor(255 );
 	legImg.getTextureReference().bind();
-		puppet.drawFaces();
+	puppet.drawFaces();
 	legImg.getTextureReference().unbind();
 
 	ofSetColor(128, 24);
@@ -240,7 +251,6 @@ void ofApp::draw(){
 	glPointSize(3);
 	tri.triangleMesh.draw(OF_MESH_POINTS);
 	glPointSize(1);
-
 
 	//draw current tri selection
 	ofSetColor(255,0,0,64);
@@ -265,31 +275,10 @@ void ofApp::draw(){
 		ofCircle(tempVertex, 5);
 	}
 
-	ofSetColor(255);
-
 	ofSetupScreen();
-
-	string instr =	string("left click to add mesh points (first 2 not visible!)\n") +
-					"right click on mesh point to delete it\n" +
-					"s : save Mesh and selected triangles\n" +
-					"l : load Mesh and selected triangles\n" +
-					"c : clear All Mesh Points\n" +
-					"C : clear Triangle Selection\n" +
-					"a : add/remove mouse-over Triangle to/from selection\n" +
-					"A : add all triangles to selection\n" +
-					"p : make Puppet from selected triangles\n";
-
-	ofDrawBitmapString(instr, 20,ofGetHeight() - 130);
-
 	tri.draw();
-    
-    //cam.draw(0, 0);
-	ofSetLineWidth(2);
-	tracker.getImageFeature(tracker.LEFT_EYEBROW).draw();
-    tracker.getImageFeature(tracker.RIGHT_EYEBROW).draw();
-	ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
-    
-    imgTracker.draw();
+	//ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
+    //imgTracker.draw();
 
 }
 
@@ -307,9 +296,26 @@ void ofApp::mousePressed( int x, int y, int button ){
 			draggingVertex = true;
 			selectedTriangles.clear();
 		}else{ //mouse not over a vertex
-			tri.addPoint(x, y, 0);
+            
+            ofPoint p = ofPoint(x,y,0);
+            
+            if (numClicks < 5) {
+                //initLeftEye.push_back(p);
+            }
+            else if (numClicks < 10) {
+                //initRightEye.push_back(p);
+            }
+            else if (numClicks < 12) {
+                //initNose.push_back(p);
+            }
+            else if (numClicks < 24) {
+                //initMouth.push_back(p);
+            }
+            
+			/*tri.addPoint(x, y, 0);
 			tri.triangulate();
 			selectedTriangles.clear();
+            numClicks++;*/
 		}
 	}else{
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
@@ -350,19 +356,16 @@ void ofApp::mouseMoved( int x, int y ){
 	x -= cameraOffset.x;
 	y -= cameraOffset.y;
 
-
-	TIME_SAMPLE_START("moved");
 	if (tri.getNumPoints() > 2) {
 		tempVertex = tri.getPointNear(ofVec2f(x,y), SELECTION_DISTANCE, mouseOverVertexIndex);
 		if (tempVertex.length() == 0.0f){ // only select triangles if not selectng vertexs
 			ITRIANGLE t = tri.getTriangleForPos(ofPoint(x,y));
 			vector<ofPoint> pts = tri.getPointsForITriangle(t);
 			tt.set(pts[0], pts[1], pts[2]);
-		}else{
+		} else {
 			tt.set(ofVec2f(), ofVec2f(), ofVec2f());
 		}
 	}
-	TIME_SAMPLE_STOP("moved");
 }
 
 
@@ -372,65 +375,101 @@ void ofApp::keyPressed( int key ){
 
 	switch(key){
             
-        case 'i': {
-            tri.addPoint(0, 0, 0);
-            tri.triangulate();
-            tri.addPoint(0, legImg.getHeight(), 0);
-            tri.triangulate();
-            tri.addPoint(legImg.getWidth(), 0, 0);
-            tri.triangulate();
-            tri.addPoint(legImg.getWidth(), legImg.getHeight(), 0);
-            tri.triangulate();
-
-
-            
-
-            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).size(); i++) {
-                tri.addPoint(imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.LEFT_EYEBROW).getVertices()[i][1], 0);
-                tri.triangulate();
-            }
-            
-            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).size(); i++) {
-                tri.addPoint(imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.RIGHT_EYEBROW).getVertices()[i][1], 0);
-                tri.triangulate();
-            }
-            
-            for (int i = 2; i < imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).size(); i++) {
-                tri.addPoint(imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.NOSE_BRIDGE).getVertices()[i][1], 0);
-                tri.triangulate();                
-            }
-
-            for (int i = 0; i < imgTracker.getImageFeature(imgTracker.INNER_MOUTH).size(); i++) {
-                tri.addPoint(imgTracker.getImageFeature(imgTracker.INNER_MOUTH).getVertices()[i][0], imgTracker.getImageFeature(imgTracker.INNER_MOUTH).getVertices()[i][1], 0);
-                tri.triangulate();
-            }
-            
+        case 'p': {
             selectedTriangles.clear();
-        }
-        break;
-
-		case 'o':{//select ALL triangles
-				selectedTriangles.clear();
-				int nTri = tri.getNumTriangles();
-				for(int i = 0; i < nTri ; i++){
-					ITRIANGLE ti = tri.getTriangleAtIndex(i);
-					if (ti != zero){
-						selectedTriangles.push_back(ti);
-					}
-				}
-			}break;
-
-		case 'p':
-			makePuppetFromSelectedTriangleMesh(tri, selectedTriangles, puppet);
+            int nTri = tri.getNumTriangles();
+            for (int i = 0; i < nTri ; i++){
+                ITRIANGLE ti = tri.getTriangleAtIndex(i);
+                if (ti != zero){
+                    selectedTriangles.push_back(ti);
+                }
+            }
+            makePuppetFromSelectedTriangleMesh(tri, selectedTriangles, puppet);
 			clear();
 			puppetMode = true;
 			puppet.setEvents(true);
-            
-            for(int i = 2; i < 14; i++){
+            for (int i = 0; i < 24; i++){
                 puppet.setControlPoint(i);
             }
 
-			break;
+            
+        } break;
+        
+        case 'o': {
+            bool foundOpaque = false;
+            for (int x = 0; x < legImg.getWidth(); x = x + 40 ) {
+                for (int y = 0; y < legImg.getHeight(); y = y + 40) {
+                    if (x == 0 || y == 0) {
+                        foundOpaque = false;
+                    }
+                    if (!foundOpaque && legImg.getColor(x, y).a != 0) {
+                        tri.addPoint(x, y, 0);
+                        tri.triangulate();
+                        selectedTriangles.clear();
+                        foundOpaque = true;
+                    }
+                    else if (foundOpaque && legImg.getColor(x, y).a == 0) {
+                        tri.addPoint(x, y, 0);
+                        tri.triangulate();
+                        selectedTriangles.clear();
+                        foundOpaque = false;
+                    }
+                }
+            }
+            
+        } break;
+            
+        case 'i' : {
+            initLeftEye.push_back(ofPoint(740, 421, 0));
+            initLeftEye.push_back(ofPoint(750, 414, 0));
+            initLeftEye.push_back(ofPoint(764, 408, 0));
+            initLeftEye.push_back(ofPoint(780, 406, 0));
+            initLeftEye.push_back(ofPoint(799, 407, 0));
+            
+            for (int i = 0; i < initLeftEye.size(); i++) {
+                tri.addPoint(initLeftEye[i].x, initLeftEye[i].y, 0);
+                tri.triangulate();
+            }
+            
+            initRightEye.push_back(ofPoint(844, 411, 0));
+            initRightEye.push_back(ofPoint(857, 400, 0));
+            initRightEye.push_back(ofPoint(873, 394, 0));
+            initRightEye.push_back(ofPoint(888, 393, 0));
+            initRightEye.push_back(ofPoint(900, 403, 0));
+            
+            for (int i = 0; i < initRightEye.size(); i++) {
+                tri.addPoint(initRightEye[i].x, initRightEye[i].y, 0);
+                tri.triangulate();
+            }
+
+            initNose.push_back(ofPoint(845, 479, 0));
+            initNose.push_back(ofPoint(847, 494, 0));
+
+            for (int i = 0; i < initNose.size(); i++) {
+                tri.addPoint(initNose[i].x, initNose[i].y, 0);
+                tri.triangulate();
+            }
+            
+            initMouth.push_back(ofPoint(805, 541, 0));
+            initMouth.push_back(ofPoint(819, 537, 0));
+            initMouth.push_back(ofPoint(833, 532, 0));
+            initMouth.push_back(ofPoint(846, 528, 0));
+            initMouth.push_back(ofPoint(860, 530, 0));
+            initMouth.push_back(ofPoint(874, 531, 0));
+            initMouth.push_back(ofPoint(866, 542, 0));
+            initMouth.push_back(ofPoint(855, 550, 0));
+            initMouth.push_back(ofPoint(840, 553, 0));
+            initMouth.push_back(ofPoint(825, 552, 0));
+            initMouth.push_back(ofPoint(811, 553, 0));
+            initMouth.push_back(ofPoint(794, 549, 0));
+
+            for (int i = 0; i < initMouth.size(); i++) {
+                tri.addPoint(initMouth[i].x, initMouth[i].y, 0);
+                tri.triangulate();
+            }
+
+        } break;
+                        
 	}
 }
 
@@ -444,8 +483,7 @@ void ofApp::clear(){
 
 
 void ofApp::saveMesh(ofxDelaunay & t, vector<ITRIANGLE> & selected){
-
-	cout << "saveMesh\n";
+    
 	ofxXmlSettings xml;
 
 	xml.loadFile(MESH_XML_FILENAME);
@@ -477,8 +515,6 @@ void ofApp::loadMesh(ofxDelaunay & t, vector<ITRIANGLE> & selected){
 
 	tri.reset();
 	selectedTriangles.clear();
-
-	cout << "loadMesh\n";
 	ofxXmlSettings xml;
 
 	xml.loadFile(MESH_XML_FILENAME);
