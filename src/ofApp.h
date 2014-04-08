@@ -7,6 +7,7 @@
 #include "ofxRemoteUIServer.h"
 #include "ofxCv.h"
 #include "ofxFaceTracker.h"
+#include "ofxOpenCv.h"
 
 #define XML_TAG_POINT_NAME					"meshPoint"
 #define XML_TAG_SELECTION_TRIANGLE_NAME		"SelectionTriangleIndex"
@@ -85,4 +86,30 @@ public:
     vector<ofPoint> diffRightEye;
     vector<ofPoint> diffNose;
     vector<ofPoint> diffMouth;
+    
+    vector<ofPoint> puppetTorso;
+    vector<ofPoint> puppetLeftArm;
+    vector<ofPoint> puppetRightArm;
+    
+    int count = 0;
+    float avgHue = 0;
+    float avgBri = 0;
+    float avgLight = 0;
+    float avgTopColorR = 0;
+    float avgTopColorB = 0;
+    float avgTopColorG = 0;
+    ofColor avgTopColor;
+    
+    float noseHue = 0;
+    float noseBri = 0;
+    float noseLight = 0;
+    
+    ofxCvColorImage	colorImg;
+    ofxCvGrayscaleImage grayImage;
+    ofxCvGrayscaleImage grayBg;
+    ofxCvGrayscaleImage grayDiff;
+    
+    ofxCvContourFinder contourFinder;
+    
+    int threshold;
 };

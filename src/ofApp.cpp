@@ -123,23 +123,28 @@ void ofApp::setup(){
 	puppet.setEvents(false);
 
     //imgTracker.setup();
-    legImg.loadImage("picture.png");
-    legImg.resize(legImg.getWidth()/3, legImg.getHeight()/3);
+    legImg.loadImage("picture.jpg");
+    legImg.resize(320, 240);
     
     //imgTracker.update(ofxCv::toCv(legImg));
     
 	draggingVertex = false;
 	puppetMode = false;
 
-//	OFX_REMOTEUI_SERVER_SETUP(10000);
-//	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
-//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawMesh);
-//	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawCtrlpoints);
-//	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
+    // OFX_REMOTEUI_SERVER_SETUP(10000);
+    // OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
+    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
+    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawMesh);
+    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawCtrlpoints);
+    // OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
     
-    cam.initGrabber(1280, 720);
+    cam.initGrabber(320, 240);
 	tracker.setup();
+    
+    colorImg.allocate(320,240);
+    grayImage.allocate(320,240);
+    grayBg.allocate(320,240);
+    grayDiff.allocate(320,240);
 }
 
 void ofApp::update(){
@@ -151,6 +156,14 @@ void ofApp::update(){
 
 	vector<int> ids = puppet.getControlPointIDs();    
     cam.update();
+    tracker.update(ofxCv::toCv(cam));
+    
+    colorImg.setFromPixels(legImg.getPixelsRef());
+    grayImage = colorImg; // convert our color image to a grayscale image
+    grayDiff.absDiff(grayBg, grayImage);
+    grayDiff.threshold(100);
+    contourFinder.findContours(grayDiff, 5, (340*240)/4, 4, false, true);
+    
 	if(cam.isFrameNew() && ids.size() > 0) {
 		tracker.update(ofxCv::toCv(cam));
         if (tracker.getFound()){
@@ -218,13 +231,30 @@ void ofApp::exit(){
 
 void ofApp::draw(){
     
-	ofTranslate(cameraOffset.x, cameraOffset.y);
-
-	float s = 1;
+    ofSetHexColor(0xffffff);
+    colorImg.draw(0, 0, 320, 240);
+    grayDiff.draw(0, 240, 320, 240);
+    ofRect(320, 0, 320, 240);
+    contourFinder.draw(320, 0, 320, 240);
+    ofColor c(255, 255, 255);
+    /*for(int i = 0; i < contourFinder.nBlobs; i++) {
+        ofRectangle r = contourFinder.blobs.at(i).boundingRect;
+        r.x += 320; r.y += 240;
+        c.setHsb(i * 64, 255, 255);
+        ofSetColor(c);
+        ofRect(r);
+    }*/
+    
 	ofSetColor(255);
-	if(!puppetMode){
-		legImg.draw(0,0, legImg.getWidth()*s, legImg.getHeight()*s);
-	}
+    //cam.draw(0, 0);
+    cam.draw(15, 15, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
+    //tracker.draw();
+    
+	//ofTranslate(cameraOffset.x, cameraOffset.y);
+    ofSetColor(255);
+    if(!puppetMode){
+        legImg.draw(0,0, legImg.getWidth(), legImg.getHeight());
+    }
 
 	//anim guidelines
 	if(puppetMode){
@@ -233,9 +263,9 @@ void ofApp::draw(){
 		ofPushMatrix();
 		ofFill();
 	}
+    
 
-
-	ofSetColor(255 );
+	ofSetColor(255);
 	legImg.getTextureReference().bind();
 	puppet.drawFaces();
 	legImg.getTextureReference().unbind();
@@ -277,14 +307,93 @@ void ofApp::draw(){
 
 	ofSetupScreen();
 	tri.draw();
+    
+    if (tracker.getFound()) {
+        float x1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].x) / 2;
+        float y1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].y + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].y) / 2;
+        float x2 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[4].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4].x) / 2;
+        float y2 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[4].y + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4].y) / 2;
+        float x3 = ((tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].x + tracker.getImageFeature(tracker.JAW).getVertices()[8].x) / 2 + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].x) / 2;
+        float y3 = ((tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].y + tracker.getImageFeature(tracker.JAW).getVertices()[8].y) / 2 + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].y) / 2;
+        
+        ofPixels px = cam.getPixelsRef();
+        ofColor c1 = px.getColor(x1, y1);
+        ofColor c2 = px.getColor(x2, y2);
+        ofColor c3 = px.getColor(x3, y3);
+        
+        int n1 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2].x;
+        int n2 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2].y;
+        int n3 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3].x;
+        int n4 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3].y;
+        ofColor c4 = px.getColor(n1, n2);
+        ofColor c5 = px.getColor(n3, n4);
+        
+        count ++;
+        
+        avgBri = (avgBri * (count - 1) + (c1.getBrightness() + c2.getBrightness() + c3.getBrightness()) / 3) / count;
+        avgLight = (avgLight * (count - 1) + (c1.getLightness() + c2.getLightness() + c3.getLightness()) / 3) / count;
+        
+        noseBri = (noseBri * (count - 1) + (c4.getBrightness() + c5.getBrightness()) / 2) / count;
+        noseLight = (noseLight * (count - 1) + (c4.getLightness() + c5.getLightness()) / 2) / count;
+        
+        float x4 = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3].x;
+        float y4 = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3].y;
+        float x5 = tracker.getImageFeature(tracker.JAW).getVertices()[8].x;
+        float y5 = tracker.getImageFeature(tracker.JAW).getVertices()[8].y;
+        float topX = (x4 + x5) / 2;
+        float topY = y4 + y5;
+        if (cam.getHeight() < topY) {
+            topY = cam.getHeight() - 2;
+        }
+        ofColor topColor = px.getColor(topX, topY);
+        avgTopColorR += topColor.r;
+        avgTopColorB += topColor.b;
+        avgTopColorG += topColor.g;
+        
+        if (count == 50) {
+            int bright = int(noseBri - avgBri);
+            int light = int(noseLight - avgLight);
+            if (bright < 50 && light < 50) {
+                cout << "YOU DON'T HAVE A BEARD!";
+                cout << "\n";
+            } else {
+                cout << "YOU HAVE A BEARD!";
+                cout << "\n";
+            }
+            avgTopColor = ofColor(avgTopColorR/50, avgTopColorB/50, avgTopColorG/50);
+        }
+        
+        if (count > 50) {
+            ofSetColor(avgTopColor.r, avgTopColor.b, avgTopColor.g, 160);
+            //ofCircle(topX, topY, 50);
+            if (puppetTorso.size() == 7 && puppetMode) {
+                ofSetPolyMode(OF_POLY_WINDING_NONZERO);
+                ofBeginShape();
+                for (int i =  0; i <  puppetTorso.size(); i++) {
+                    ofPoint p = puppet.getDeformedMesh().getVertices()[i+24];
+                    ofVertex(p.x, p.y);
+                }
+                ofEndShape();
+            }
+        }
+    }
+    
 	//ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
-    //imgTracker.draw();
+    //imgTracker.draw();*/
 
 }
 
 
 void ofApp::mousePressed( int x, int y, int button ){
 
+    cout << "\n";
+    cout << "puppetTorso.push_back(ofPoint(";
+    cout << x;
+    cout << ", ";
+    cout << y;
+    cout << ", 0));";
+    cout << "\n";
+    
 	if(puppetMode) return;
 
 	x -= cameraOffset.x;
@@ -295,27 +404,6 @@ void ofApp::mousePressed( int x, int y, int button ){
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
 			draggingVertex = true;
 			selectedTriangles.clear();
-		}else{ //mouse not over a vertex
-            
-            ofPoint p = ofPoint(x,y,0);
-            
-            if (numClicks < 5) {
-                //initLeftEye.push_back(p);
-            }
-            else if (numClicks < 10) {
-                //initRightEye.push_back(p);
-            }
-            else if (numClicks < 12) {
-                //initNose.push_back(p);
-            }
-            else if (numClicks < 24) {
-                //initMouth.push_back(p);
-            }
-            
-			/*tri.addPoint(x, y, 0);
-			tri.triangulate();
-			selectedTriangles.clear();
-            numClicks++;*/
 		}
 	}else{
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
@@ -397,25 +485,26 @@ void ofApp::keyPressed( int key ){
         
         case 'o': {
             bool foundOpaque = false;
-            for (int x = 0; x < legImg.getWidth(); x = x + 40 ) {
-                for (int y = 0; y < legImg.getHeight(); y = y + 40) {
+            for (int x = 0; x < legImg.getWidth(); x = x + 60 ) {
+                for (int y = 0; y < legImg.getHeight(); y = y + 60) {
                     if (x == 0 || y == 0) {
                         foundOpaque = false;
                     }
                     if (!foundOpaque && legImg.getColor(x, y).a != 0) {
                         tri.addPoint(x, y, 0);
                         tri.triangulate();
-                        selectedTriangles.clear();
+                        //selectedTriangles.clear();
                         foundOpaque = true;
                     }
                     else if (foundOpaque && legImg.getColor(x, y).a == 0) {
                         tri.addPoint(x, y, 0);
                         tri.triangulate();
-                        selectedTriangles.clear();
+                        //selectedTriangles.clear();
                         foundOpaque = false;
                     }
                 }
             }
+                        
             
         } break;
             
@@ -467,9 +556,36 @@ void ofApp::keyPressed( int key ){
                 tri.addPoint(initMouth[i].x, initMouth[i].y, 0);
                 tri.triangulate();
             }
-
+            
+            puppetTorso.push_back(ofPoint(928, 811, 0));
+            puppetTorso.push_back(ofPoint(977, 1031, 0));
+            puppetTorso.push_back(ofPoint(960, 1206, 0));
+            puppetTorso.push_back(ofPoint(741, 1282, 0));
+            puppetTorso.push_back(ofPoint(522, 1063, 0));
+            puppetTorso.push_back(ofPoint(617, 862, 0));
+            puppetTorso.push_back(ofPoint(514, 709, 0));
+            
+            for (int i = 0; i < puppetTorso.size(); i++) {
+                tri.addPoint(puppetTorso[i].x, puppetTorso[i].y, 0);
+                tri.triangulate();
+            }
+            
+            
         } break;
-                        
+        
+        // restart beard detection
+        case 'r' : {
+            count = 0;
+            avgHue = 0;
+            avgBri = 0;
+            avgLight = 0;
+            noseHue = 0;
+            noseBri = 0;
+            noseLight = 0;
+            avgTopColorR = 0;
+            avgTopColorB = 0;
+            avgTopColorG = 0;
+        }
 	}
 }
 
