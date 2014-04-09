@@ -59,6 +59,7 @@ public:
 	ofxDelaunay tri;
 
 	ofImage legImg;
+	ofImage contourImg;
 	Triangle tt; //temp triangle to draw mouseOver
 	ofVec2f tempVertex;
 	int mouseOverVertexIndex; //idex of the vertex that we are mouseOvering on, otherwise -1
@@ -90,6 +91,7 @@ public:
     vector<ofPoint> puppetTorso;
     vector<ofPoint> puppetLeftArm;
     vector<ofPoint> puppetRightArm;
+    vector<ofPoint> puppetPotato;
     
     int count = 0;
     float avgHue = 0;

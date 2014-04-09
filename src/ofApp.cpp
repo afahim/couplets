@@ -123,28 +123,30 @@ void ofApp::setup(){
 	puppet.setEvents(false);
 
     //imgTracker.setup();
-    legImg.loadImage("picture.jpg");
-    legImg.resize(320, 240);
+    contourImg.loadImage("picture.jpg");
+    contourImg.resize(contourImg.getWidth()/6, contourImg.getHeight()/6);
+    
+    legImg.loadImage("picture.png");
+    legImg.resize(legImg.getWidth()/6, legImg.getHeight()/6);
     
     //imgTracker.update(ofxCv::toCv(legImg));
     
 	draggingVertex = false;
 	puppetMode = false;
-
-    // OFX_REMOTEUI_SERVER_SETUP(10000);
-    // OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawIDs);
-    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawMesh);
-    // OFX_REMOTEUI_SERVER_SHARE_PARAM(drawCtrlpoints);
-    // OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
-    
-    cam.initGrabber(320, 240);
+   
+    cam.initGrabber(1280, 780);
 	tracker.setup();
     
-    colorImg.allocate(320,240);
-    grayImage.allocate(320,240);
-    grayBg.allocate(320,240);
-    grayDiff.allocate(320,240);
+    colorImg.allocate(contourImg.getWidth(),contourImg.getHeight());
+    grayImage.allocate(contourImg.getWidth(),contourImg.getHeight());
+    grayBg.allocate(contourImg.getWidth(),contourImg.getHeight());
+    grayDiff.allocate(contourImg.getWidth(),contourImg.getHeight());
+
+    colorImg.setFromPixels(contourImg.getPixelsRef());
+    grayImage = colorImg; // convert our color image to a grayscale image
+    grayDiff.absDiff(grayBg, grayImage);
+    grayDiff.threshold(100);
+    contourFinder.findContours(grayDiff, 5, (contourImg.getWidth()*contourImg.getHeight())/4, 4, false, false);
 }
 
 void ofApp::update(){
@@ -157,12 +159,6 @@ void ofApp::update(){
 	vector<int> ids = puppet.getControlPointIDs();    
     cam.update();
     tracker.update(ofxCv::toCv(cam));
-    
-    colorImg.setFromPixels(legImg.getPixelsRef());
-    grayImage = colorImg; // convert our color image to a grayscale image
-    grayDiff.absDiff(grayBg, grayImage);
-    grayDiff.threshold(100);
-    contourFinder.findContours(grayDiff, 5, (340*240)/4, 4, false, true);
     
 	if(cam.isFrameNew() && ids.size() > 0) {
 		tracker.update(ofxCv::toCv(cam));
@@ -230,28 +226,8 @@ void ofApp::exit(){
 
 
 void ofApp::draw(){
-    
-    ofSetHexColor(0xffffff);
-    colorImg.draw(0, 0, 320, 240);
-    grayDiff.draw(0, 240, 320, 240);
-    ofRect(320, 0, 320, 240);
-    contourFinder.draw(320, 0, 320, 240);
-    ofColor c(255, 255, 255);
-    /*for(int i = 0; i < contourFinder.nBlobs; i++) {
-        ofRectangle r = contourFinder.blobs.at(i).boundingRect;
-        r.x += 320; r.y += 240;
-        c.setHsb(i * 64, 255, 255);
-        ofSetColor(c);
-        ofRect(r);
-    }*/
-    
 	ofSetColor(255);
-    //cam.draw(0, 0);
     cam.draw(15, 15, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
-    //tracker.draw();
-    
-	//ofTranslate(cameraOffset.x, cameraOffset.y);
-    ofSetColor(255);
     if(!puppetMode){
         legImg.draw(0,0, legImg.getWidth(), legImg.getHeight());
     }
@@ -262,8 +238,7 @@ void ofApp::draw(){
 		ofSetColor(0);
 		ofPushMatrix();
 		ofFill();
-	}
-    
+	}    
 
 	ofSetColor(255);
 	legImg.getTextureReference().bind();
@@ -365,8 +340,7 @@ void ofApp::draw(){
         
         if (count > 50) {
             ofSetColor(avgTopColor.r, avgTopColor.b, avgTopColor.g, 160);
-            //ofCircle(topX, topY, 50);
-            if (puppetTorso.size() == 7 && puppetMode) {
+            if (puppetTorso.size() == 4 && puppetMode) {
                 ofSetPolyMode(OF_POLY_WINDING_NONZERO);
                 ofBeginShape();
                 for (int i =  0; i <  puppetTorso.size(); i++) {
@@ -378,21 +352,20 @@ void ofApp::draw(){
         }
     }
     
-	//ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
-    //imgTracker.draw();*/
-
+    //ofSetHexColor(0xffffff);
+    //colorImg.draw(0, 0, 320, 240);
+    //grayDiff.draw(0, 240, 320, 240);
+    //ofRect(320, 0, 320, 240);
+    //contourFinder.draw(0, 0);
 }
 
 
 void ofApp::mousePressed( int x, int y, int button ){
 
     cout << "\n";
-    cout << "puppetTorso.push_back(ofPoint(";
     cout << x;
     cout << ", ";
     cout << y;
-    cout << ", 0));";
-    cout << "\n";
     
 	if(puppetMode) return;
 
@@ -400,12 +373,12 @@ void ofApp::mousePressed( int x, int y, int button ){
 	y -= cameraOffset.y;
 
 	//add points to mesh
-	if(button == 0){
+	if(button == 0) {
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
 			draggingVertex = true;
 			selectedTriangles.clear();
 		}
-	}else{
+	} else {
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
 			selectedTriangles.clear();
 			tri.removePointAtIndex(mouseOverVertexIndex);
@@ -468,9 +441,9 @@ void ofApp::keyPressed( int key ){
             int nTri = tri.getNumTriangles();
             for (int i = 0; i < nTri ; i++){
                 ITRIANGLE ti = tri.getTriangleAtIndex(i);
-                if (ti != zero){
+                //if (ti != zero){
                     selectedTriangles.push_back(ti);
-                }
+                //}
             }
             makePuppetFromSelectedTriangleMesh(tri, selectedTriangles, puppet);
 			clear();
@@ -478,99 +451,62 @@ void ofApp::keyPressed( int key ){
 			puppet.setEvents(true);
             for (int i = 0; i < 24; i++){
                 puppet.setControlPoint(i);
-            }
-
-            
+            }            
         } break;
         
-        case 'o': {
-            bool foundOpaque = false;
-            for (int x = 0; x < legImg.getWidth(); x = x + 60 ) {
-                for (int y = 0; y < legImg.getHeight(); y = y + 60) {
-                    if (x == 0 || y == 0) {
-                        foundOpaque = false;
-                    }
-                    if (!foundOpaque && legImg.getColor(x, y).a != 0) {
-                        tri.addPoint(x, y, 0);
-                        tri.triangulate();
-                        //selectedTriangles.clear();
-                        foundOpaque = true;
-                    }
-                    else if (foundOpaque && legImg.getColor(x, y).a == 0) {
-                        tri.addPoint(x, y, 0);
-                        tri.triangulate();
-                        //selectedTriangles.clear();
-                        foundOpaque = false;
-                    }
-                }
+        case 'o': {        
+            for(int i = 0; i < contourFinder.blobs[0].pts.size(); i = i + 40) {
+                float cPointX = contourFinder.blobs[0].pts[i].x;
+                float cPointY = contourFinder.blobs[0].pts[i].y;
+                tri.addPoint(cPointX, cPointY, 0);
             }
-                        
-            
+            tri.triangulate();
         } break;
             
         case 'i' : {
-            initLeftEye.push_back(ofPoint(740, 421, 0));
-            initLeftEye.push_back(ofPoint(750, 414, 0));
-            initLeftEye.push_back(ofPoint(764, 408, 0));
-            initLeftEye.push_back(ofPoint(780, 406, 0));
-            initLeftEye.push_back(ofPoint(799, 407, 0));
+            initLeftEye.push_back(ofPoint(370, 210.5, 0));
+            initLeftEye.push_back(ofPoint(375, 207, 0));
+            initLeftEye.push_back(ofPoint(382, 204, 0));
+            initLeftEye.push_back(ofPoint(390, 203, 0));
+            initLeftEye.push_back(ofPoint(399.5, 203.5, 0));
             
             for (int i = 0; i < initLeftEye.size(); i++) {
                 tri.addPoint(initLeftEye[i].x, initLeftEye[i].y, 0);
-                tri.triangulate();
             }
             
-            initRightEye.push_back(ofPoint(844, 411, 0));
-            initRightEye.push_back(ofPoint(857, 400, 0));
-            initRightEye.push_back(ofPoint(873, 394, 0));
-            initRightEye.push_back(ofPoint(888, 393, 0));
-            initRightEye.push_back(ofPoint(900, 403, 0));
+            initRightEye.push_back(ofPoint(422, 205.5, 0));
+            initRightEye.push_back(ofPoint(428.5, 200, 0));
+            initRightEye.push_back(ofPoint(436.5, 197, 0));
+            initRightEye.push_back(ofPoint(444, 196.5, 0));
+            initRightEye.push_back(ofPoint(450, 201.5, 0));
             
             for (int i = 0; i < initRightEye.size(); i++) {
                 tri.addPoint(initRightEye[i].x, initRightEye[i].y, 0);
-                tri.triangulate();
             }
-
-            initNose.push_back(ofPoint(845, 479, 0));
-            initNose.push_back(ofPoint(847, 494, 0));
+            
+            initNose.push_back(ofPoint(422.5, 239.5, 0));
+            initNose.push_back(ofPoint(423.5, 247, 0));
 
             for (int i = 0; i < initNose.size(); i++) {
                 tri.addPoint(initNose[i].x, initNose[i].y, 0);
-                tri.triangulate();
             }
             
-            initMouth.push_back(ofPoint(805, 541, 0));
-            initMouth.push_back(ofPoint(819, 537, 0));
-            initMouth.push_back(ofPoint(833, 532, 0));
-            initMouth.push_back(ofPoint(846, 528, 0));
-            initMouth.push_back(ofPoint(860, 530, 0));
-            initMouth.push_back(ofPoint(874, 531, 0));
-            initMouth.push_back(ofPoint(866, 542, 0));
-            initMouth.push_back(ofPoint(855, 550, 0));
-            initMouth.push_back(ofPoint(840, 553, 0));
-            initMouth.push_back(ofPoint(825, 552, 0));
-            initMouth.push_back(ofPoint(811, 553, 0));
-            initMouth.push_back(ofPoint(794, 549, 0));
-
+            initMouth.push_back(ofPoint(402.5, 270.5, 0));
+            initMouth.push_back(ofPoint(409.5, 268.5, 0));
+            initMouth.push_back(ofPoint(416.5, 266, 0));
+            initMouth.push_back(ofPoint(423, 264, 0));
+            initMouth.push_back(ofPoint(430, 265, 0));
+            initMouth.push_back(ofPoint(437, 265.5, 0));
+            initMouth.push_back(ofPoint(433, 271, 0));
+            initMouth.push_back(ofPoint(427.5, 275, 0));
+            initMouth.push_back(ofPoint(420, 276.5, 0));
+            initMouth.push_back(ofPoint(412.5, 276, 0));
+            initMouth.push_back(ofPoint(405.5, 276.5, 0));
+            initMouth.push_back(ofPoint(397, 274.5, 0));
+            
             for (int i = 0; i < initMouth.size(); i++) {
                 tri.addPoint(initMouth[i].x, initMouth[i].y, 0);
-                tri.triangulate();
             }
-            
-            puppetTorso.push_back(ofPoint(928, 811, 0));
-            puppetTorso.push_back(ofPoint(977, 1031, 0));
-            puppetTorso.push_back(ofPoint(960, 1206, 0));
-            puppetTorso.push_back(ofPoint(741, 1282, 0));
-            puppetTorso.push_back(ofPoint(522, 1063, 0));
-            puppetTorso.push_back(ofPoint(617, 862, 0));
-            puppetTorso.push_back(ofPoint(514, 709, 0));
-            
-            for (int i = 0; i < puppetTorso.size(); i++) {
-                tri.addPoint(puppetTorso[i].x, puppetTorso[i].y, 0);
-                tri.triangulate();
-            }
-            
-            
         } break;
         
         // restart beard detection
