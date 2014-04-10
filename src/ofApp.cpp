@@ -362,10 +362,34 @@ void ofApp::draw(){
 
 void ofApp::mousePressed( int x, int y, int button ){
 
-    cout << "\n";
-    cout << x;
-    cout << ", ";
-    cout << y;
+    if (record24Points) {
+        if (clicksRecorded < 24)
+        {
+            if (clicksRecorded < 5) {
+                initLeftEye.push_back(ofPoint(x, y, 0));
+            } else if (clicksRecorded < 10) {
+                initRightEye.push_back(ofPoint(x, y, 0));
+            } else if (clicksRecorded < 12) {
+                initNose.push_back(ofPoint(x, y, 0));
+            } else if (clicksRecorded < 24) {
+                initMouth.push_back(ofPoint(x, y, 0));
+            }
+            
+            tri.addPoint(x,y, 0);
+            clicksRecorded++;
+        }
+        
+        if (clicksRecorded == 24) {
+            cout << "finding contour";
+            for(int i = 0; i < contourFinder.blobs[0].pts.size(); i = i + 40) {
+                float cPointX = contourFinder.blobs[0].pts[i].x;
+                float cPointY = contourFinder.blobs[0].pts[i].y;
+                tri.addPoint(cPointX, cPointY, 0);
+            }
+            tri.triangulate();
+            saveMesh(tri, selectedTriangles);
+        }
+    }
     
 	if(puppetMode) return;
 
@@ -435,7 +459,8 @@ void ofApp::keyPressed( int key ){
 	ITRIANGLE zero;
 
 	switch(key){
-            
+		case 's': saveMesh(tri, selectedTriangles); break;
+		case 'l': loadMesh(tri, selectedTriangles); tri.triangulate(); break;
         case 'p': {
             selectedTriangles.clear();
             int nTri = tri.getNumTriangles();
@@ -451,7 +476,8 @@ void ofApp::keyPressed( int key ){
 			puppet.setEvents(true);
             for (int i = 0; i < 24; i++){
                 puppet.setControlPoint(i);
-            }            
+            }
+            selectedTriangles.clear();
         } break;
         
         case 'o': {        
@@ -463,50 +489,8 @@ void ofApp::keyPressed( int key ){
             tri.triangulate();
         } break;
             
-        case 'i' : {
-            initLeftEye.push_back(ofPoint(370, 210.5, 0));
-            initLeftEye.push_back(ofPoint(375, 207, 0));
-            initLeftEye.push_back(ofPoint(382, 204, 0));
-            initLeftEye.push_back(ofPoint(390, 203, 0));
-            initLeftEye.push_back(ofPoint(399.5, 203.5, 0));
-            
-            for (int i = 0; i < initLeftEye.size(); i++) {
-                tri.addPoint(initLeftEye[i].x, initLeftEye[i].y, 0);
-            }
-            
-            initRightEye.push_back(ofPoint(422, 205.5, 0));
-            initRightEye.push_back(ofPoint(428.5, 200, 0));
-            initRightEye.push_back(ofPoint(436.5, 197, 0));
-            initRightEye.push_back(ofPoint(444, 196.5, 0));
-            initRightEye.push_back(ofPoint(450, 201.5, 0));
-            
-            for (int i = 0; i < initRightEye.size(); i++) {
-                tri.addPoint(initRightEye[i].x, initRightEye[i].y, 0);
-            }
-            
-            initNose.push_back(ofPoint(422.5, 239.5, 0));
-            initNose.push_back(ofPoint(423.5, 247, 0));
-
-            for (int i = 0; i < initNose.size(); i++) {
-                tri.addPoint(initNose[i].x, initNose[i].y, 0);
-            }
-            
-            initMouth.push_back(ofPoint(402.5, 270.5, 0));
-            initMouth.push_back(ofPoint(409.5, 268.5, 0));
-            initMouth.push_back(ofPoint(416.5, 266, 0));
-            initMouth.push_back(ofPoint(423, 264, 0));
-            initMouth.push_back(ofPoint(430, 265, 0));
-            initMouth.push_back(ofPoint(437, 265.5, 0));
-            initMouth.push_back(ofPoint(433, 271, 0));
-            initMouth.push_back(ofPoint(427.5, 275, 0));
-            initMouth.push_back(ofPoint(420, 276.5, 0));
-            initMouth.push_back(ofPoint(412.5, 276, 0));
-            initMouth.push_back(ofPoint(405.5, 276.5, 0));
-            initMouth.push_back(ofPoint(397, 274.5, 0));
-            
-            for (int i = 0; i < initMouth.size(); i++) {
-                tri.addPoint(initMouth[i].x, initMouth[i].y, 0);
-            }
+        case 'c' : {
+            record24Points = true;
         } break;
         
         // restart beard detection
@@ -575,6 +559,16 @@ void ofApp::loadMesh(ofxDelaunay & t, vector<ITRIANGLE> & selected){
 		float x = xml.getAttribute(XML_TAG_POINT_NAME, "x", 0.0, i);
 		float y = xml.getAttribute(XML_TAG_POINT_NAME, "y", 0.0, i);
 		tri.addPoint(x,y, 0);
+        
+        if (i < 5) {
+            initLeftEye.push_back(ofPoint(x, y, 0));
+        } else if (i < 10) {
+            initRightEye.push_back(ofPoint(x, y, 0));
+        } else if (i < 12) {
+            initNose.push_back(ofPoint(x, y, 0));
+        } else if (i < 24) {
+            initMouth.push_back(ofPoint(x, y, 0));
+        }
 	}
 
 	ITRIANGLE zero;

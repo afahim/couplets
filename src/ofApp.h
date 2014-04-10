@@ -77,7 +77,10 @@ public:
 	ofxFaceTracker tracker;//, imgTracker;
 
     int numClicks;
-        
+    
+    bool record24Points = false;
+    int clicksRecorded = 0;
+    
     vector<ofPoint> initLeftEye;
     vector<ofPoint> initRightEye;
     vector<ofPoint> initNose;
