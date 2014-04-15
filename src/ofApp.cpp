@@ -84,7 +84,7 @@ void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, vector<I
 
 	vector<int> vertexIndexesToDrop;
 	//walk the usedIndexes vector, when see a false, drop that vertex from the vector
-	// AND decrease by one all indices higher than the current in the indexTable
+	//AND decrease by one all indices higher than the current in the indexTable
 	//this way we automagically have a selected triangles vector with correct indices
 	for( int i = 0 ; i < usedIndexes.size() ; i++ ){
 		if(usedIndexes[i] == false){ //this vertex not used
@@ -121,13 +121,13 @@ void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, vector<I
 void ofApp::setup(){
 	ofSetVerticalSync(true);
 	puppet.setEvents(false);
-
-    //imgTracker.setup();
-    contourImg.loadImage("picture.jpg");
-    contourImg.resize(contourImg.getWidth()/6, contourImg.getHeight()/6);
     
-    legImg.loadImage("picture.png");
-    legImg.resize(legImg.getWidth()/6, legImg.getHeight()/6);
+    bgImg.loadImage("bg.jpg");
+    contourImg.loadImage("picture0.jpg");
+    contourImg.resize(contourImg.getWidth(), contourImg.getHeight());
+    
+    legImg.loadImage("picture0.png");
+    legImg.resize(legImg.getWidth(), legImg.getHeight());
     
     //imgTracker.update(ofxCv::toCv(legImg));
     
@@ -227,6 +227,7 @@ void ofApp::exit(){
 
 void ofApp::draw(){
 	ofSetColor(255);
+    bgImg.draw(0, 0);
     cam.draw(15, 15, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
     if(!puppetMode){
         legImg.draw(0,0, legImg.getWidth(), legImg.getHeight());
@@ -361,9 +362,9 @@ void ofApp::draw(){
 
 
 void ofApp::mousePressed( int x, int y, int button ){
-
-    if (record24Points) {
-        if (clicksRecorded < 24)
+    
+    if (createMode) {
+        if (clicksRecorded < clicksThreshold)
         {
             if (clicksRecorded < 5) {
                 initLeftEye.push_back(ofPoint(x, y, 0));
@@ -376,19 +377,32 @@ void ofApp::mousePressed( int x, int y, int button ){
             }
             
             tri.addPoint(x,y, 0);
-            clicksRecorded++;
         }
         
-        if (clicksRecorded == 24) {
-            cout << "finding contour";
+        if (clicksRecorded == clicksThreshold) {
             for(int i = 0; i < contourFinder.blobs[0].pts.size(); i = i + 40) {
                 float cPointX = contourFinder.blobs[0].pts[i].x;
                 float cPointY = contourFinder.blobs[0].pts[i].y;
                 tri.addPoint(cPointX, cPointY, 0);
             }
+            contourPtsAdded = true;
             tri.triangulate();
-            saveMesh(tri, selectedTriangles);
+            //saveMesh(tri, selectedTriangles);
         }
+        
+        if (addArmsMode && contourPtsAdded && armPtsRecorded < 6) {
+            if (armPtsRecorded < 3) {
+                leftArm.push_back(mouseOverVertexIndex);
+                cout << "left arm \n";
+            } else {
+                rightArm.push_back(mouseOverVertexIndex);
+                cout << "right arm \n";
+            }
+            armPtsRecorded++;
+        }
+        //cout << clicksRecorded;
+        //cout << "\n";
+        clicksRecorded++;
     }
     
 	if(puppetMode) return;
@@ -404,9 +418,10 @@ void ofApp::mousePressed( int x, int y, int button ){
 		}
 	} else {
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
+            
 			selectedTriangles.clear();
 			tri.removePointAtIndex(mouseOverVertexIndex);
-			tri.triangulate();
+			//tri.triangulate();
 		}
 	}
 }
@@ -443,6 +458,8 @@ void ofApp::mouseMoved( int x, int y ){
 
 	if (tri.getNumPoints() > 2) {
 		tempVertex = tri.getPointNear(ofVec2f(x,y), SELECTION_DISTANCE, mouseOverVertexIndex);
+        //cout << mouseOverVertexIndex;
+        //cout << "\n";
 		if (tempVertex.length() == 0.0f){ // only select triangles if not selectng vertexs
 			ITRIANGLE t = tri.getTriangleForPos(ofPoint(x,y));
 			vector<ofPoint> pts = tri.getPointsForITriangle(t);
@@ -486,11 +503,15 @@ void ofApp::keyPressed( int key ){
                 float cPointY = contourFinder.blobs[0].pts[i].y;
                 tri.addPoint(cPointX, cPointY, 0);
             }
+            contourPtsAdded = true;
             tri.triangulate();
         } break;
             
         case 'c' : {
-            record24Points = true;
+            createMode = true;
+        } break;
+        case 'a' : {
+            addArmsMode = true;
         } break;
         
         // restart beard detection

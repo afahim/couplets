@@ -58,6 +58,7 @@ public:
 
 	ofxDelaunay tri;
 
+    ofImage bgImg;
 	ofImage legImg;
 	ofImage contourImg;
 	Triangle tt; //temp triangle to draw mouseOver
@@ -78,8 +79,10 @@ public:
 
     int numClicks;
     
-    bool record24Points = false;
+    bool createMode = false;
     int clicksRecorded = 0;
+    bool contourPtsAdded = false;
+    bool addArmsMode = false;
     
     vector<ofPoint> initLeftEye;
     vector<ofPoint> initRightEye;
@@ -95,6 +98,10 @@ public:
     vector<ofPoint> puppetLeftArm;
     vector<ofPoint> puppetRightArm;
     vector<ofPoint> puppetPotato;
+
+    int armPtsRecorded = 0;
+    vector<int> leftArm;
+    vector<int> rightArm;
     
     int count = 0;
     float avgHue = 0;
@@ -115,6 +122,7 @@ public:
     ofxCvGrayscaleImage grayDiff;
     
     ofxCvContourFinder contourFinder;
+    int clicksThreshold = 24;
     
     int threshold;
 };
