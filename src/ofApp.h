@@ -4,15 +4,16 @@
 #include "ofxPuppetInteractive.h"
 #include "ofxDelaunay.h"
 #include "ofxXmlSettings.h"
-#include "ofxRemoteUIServer.h"
 #include "ofxCv.h"
 #include "ofxFaceTracker.h"
 #include "ofxOpenCv.h"
+#include <sstream>
 
-#define XML_TAG_POINT_NAME					"meshPoint"
-#define XML_TAG_SELECTION_TRIANGLE_NAME		"SelectionTriangleIndex"
-#define MESH_XML_FILENAME					"trianglePoints.xml"
-#define SELECTION_DISTANCE					13
+#define XML_TAG_MESH_POINT  "meshPoint"
+#define XML_TAG_FACE_POINT  "facePoint"
+#define XML_TAG_FACE_INDEX  "faceIndex"
+#define MESH_XML_FILENAME   "trianglePoints.xml"
+#define SELECTION_DISTANCE  5
 
 struct Triangle{
 	ofVec2f p0, p1, p2;
@@ -30,43 +31,35 @@ struct TriangleIndexPtrs{
 class ofApp : public ofBaseApp{
 
 public:
-
 	void setup();
 	void update();
 	void draw();
-	void exit();
 
 	void mousePressed( int x, int y, int button );
 	void mouseMoved( int x, int y );
-	void mouseDragged(int x, int y, int button);
-	void mouseReleased(int x, int y, int button );
+	void mouseDragged( int x, int y, int button);
+	void mouseReleased( int x, int y, int button );
 	void keyPressed( int key );
 
-	void clear();
-
-
-	bool triangleInVector(const vector<ITRIANGLE> &selectedTriangles, ITRIANGLE t );
 	ofMesh makeGrid(ofRectangle square, int nHoriz, int nVert);
-	void saveMesh( ofxDelaunay & points, vector<ITRIANGLE> & selected);
-	void loadMesh(ofxDelaunay & points, vector<ITRIANGLE> & selected);
-
-	void makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, vector<ITRIANGLE>selected, ofxPuppetInteractive & pup);
+    void makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup);
+    void saveMesh(ofxDelaunay & points);
+	void loadMesh(ofxDelaunay & points);
+    string ofApp::wrapText(string loadedText, int maxChars);
 
 	ofxPuppetInteractive puppet;
-
-	vector<ITRIANGLE>selectedTriangles;
-
 	ofxDelaunay tri;
 
     ofImage bgImg;
-	ofImage legImg;
+	ofImage puppetImg;
 	ofImage contourImg;
 	Triangle tt; //temp triangle to draw mouseOver
 	ofVec2f tempVertex;
-	int mouseOverVertexIndex; //idex of the vertex that we are mouseOvering on, otherwise -1
+	int mouseOverVertexIndex; //index of the vertex that we are mouseOvering on, otherwise -1
 
 	bool draggingVertex;
 	bool puppetMode;
+    bool createMode = false;
 	ofVec3f cameraOffset;
 
 	bool drawIDs;
@@ -75,33 +68,20 @@ public:
     bool isInit = true;
     
     ofVideoGrabber cam;
-	ofxFaceTracker tracker;//, imgTracker;
+	ofxFaceTracker tracker;
 
     int numClicks;
-    
-    bool createMode = false;
     int clicksRecorded = 0;
-    bool contourPtsAdded = false;
-    bool addArmsMode = false;
+    int indRecorded = 0;
     
-    vector<ofPoint> initLeftEye;
-    vector<ofPoint> initRightEye;
-    vector<ofPoint> initNose;
-    vector<ofPoint> initMouth;
-    
-    vector<ofPoint> diffLeftEye;
-    vector<ofPoint> diffRightEye;
-    vector<ofPoint> diffNose;
-    vector<ofPoint> diffMouth;
+    vector<int>     indexFace;
+    vector<ofPoint> coordFace;    
+    vector<ofPoint> diffFace;
     
     vector<ofPoint> puppetTorso;
     vector<ofPoint> puppetLeftArm;
     vector<ofPoint> puppetRightArm;
     vector<ofPoint> puppetPotato;
-
-    int armPtsRecorded = 0;
-    vector<int> leftArm;
-    vector<int> rightArm;
     
     int count = 0;
     float avgHue = 0;
@@ -120,9 +100,19 @@ public:
     ofxCvGrayscaleImage grayImage;
     ofxCvGrayscaleImage grayBg;
     ofxCvGrayscaleImage grayDiff;
-    
     ofxCvContourFinder contourFinder;
-    int clicksThreshold = 24;
     
+    int clicksThreshold = 24;
     int threshold;
+    
+    ofTrueTypeFont titleFont;
+    ofTrueTypeFont descriptionFont;
+    
+    ofxXmlSettings xml;
+    string title;
+    string date;
+    string artist;
+    string culture;
+    string description;
+
 };

@@ -15,30 +15,17 @@
          endingLineNumber = "42">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "../../ofxDelaunay/src/ofxDelaunay.h"
-         timestampString = "418069441.72846"
+         filePath = "../../ofxDelaunay/src/ofxDelaunay.cpp"
+         timestampString = "421095336.542196"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "23"
-         endingLineNumber = "23"
-         landmarkName = "class ofxDelaunay"
-         landmarkType = "3">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "src/ofApp.h"
-         timestampString = "419268465.020174"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "87"
-         endingLineNumber = "87"
-         landmarkName = "class ofApp"
-         landmarkType = "3">
+         startingLineNumber = "88"
+         endingLineNumber = "88"
+         landmarkName = "ofxDelaunay::triangulate(ofImage image)"
+         landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

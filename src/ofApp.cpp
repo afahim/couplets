@@ -1,133 +1,29 @@
 #include "ofApp.h"
 
-ofMesh ofApp::makeGrid(ofRectangle square, int nHoriz, int nVert) {
-
-	ofMesh mesh;
-	mesh.setMode(OF_PRIMITIVE_LINES);
-	int c = 0;
-	for (int j = 0; j < nVert; j++){
-    for (int i = 0; i < nHoriz; i++){
-		float x = ofMap(i, 0, nHoriz-1, square.x, square.x + square.width);
-		float y = ofMap(j, 0, nVert-1, square.y, square.y + square.height);
-		mesh.addVertex(ofPoint(x,y));
-		printf("(%d)  %.0f %.0f\n", c, x, y);
-		c++;
-	}
-	}
-
-	printf("################\n" );
-
-	for ( unsigned int y = 0; y < (nVert-1); y++ ) {
-		for ( unsigned int x = 0; x < nHoriz-1; x++ ) {
-			unsigned int nRow1 = y * nHoriz;
-			unsigned int nRow2 = (y+1) * nHoriz;
-			mesh.addIndex(nRow1 + x); printf("%d\n", nRow1 + x);
-			mesh.addIndex(nRow2 + x + 1); printf("%d\n",nRow2 + x + 1);
-			mesh.addIndex(nRow1 + x + 1); printf("%d\n",nRow1 + x + 1);
-			mesh.addIndex(nRow1 + x); printf("%d\n",nRow1 + x);
-			mesh.addIndex(nRow2 + x); printf("%d\n",nRow2 + x);
-			mesh.addIndex(nRow2 + x + 1); printf("%d\n",nRow2 + x + 1);
-			printf("------\n");
-		}
-	}
-
-	return mesh;
-}
-
-
-void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, vector<ITRIANGLE>selected, ofxPuppetInteractive & pup){
-
-	triangles.triangulate(); //just in case
-	ofMesh m; m.setMode(OF_PRIMITIVE_LINES);
-
-	//init array of used vertices (all false)
-	vector<bool>usedIndexes;
-	for(int i = 0; i < triangles.triangleMesh.getVertices().size(); i++){
-		usedIndexes.push_back(false);
-	}
-
-	int numIndices = usedIndexes.size(); //num of vertex == num of indices
-
-	//make one referance table to all possible indices
-	int * indexTable = (int*) malloc(sizeof(int) * usedIndexes.size());
-
-	//fill in the table [0, 1, 2 .. numIndices-1]
-	for(int i = 0; i < triangles.triangleMesh.getVertices().size(); i++){
-		indexTable[i] = i;
-	}
-
-	//fill in the usedIndexes vector accordingly;
-	//any vertex whose index matches a false in the "usedIndexes" vec can be dropped bc its unused
-	for( int i = 0 ; i < selectedTriangles.size() ; i++ ){
-		ITRIANGLE t = selectedTriangles[i];
-		usedIndexes[t.p1] = true;
-		usedIndexes[t.p2] = true;
-		usedIndexes[t.p3] = true;
-	}
-
-	//clone our selectedTriangles vector into referencedIndexesTriangles, but instead of each
-	//triangle having 3 indexes, each triangle will have 3 references to an index in the indexTable
-	//this way we can easily recalc all triangle indexes as some vertices are dropped bc they are unused
-	//bc no selected triangle uses them
-	vector<TriangleIndexPtrs> referencedIndexesTriangles;
-	for( int i = 0 ; i < selectedTriangles.size() ; i++ ){
-		ITRIANGLE t = selectedTriangles[i];
-		TriangleIndexPtrs tp;
-		tp.p1 = &indexTable[t.p1];
-		tp.p2 = &indexTable[t.p2];
-		tp.p3 = &indexTable[t.p3];
-		referencedIndexesTriangles.push_back(tp);
-	}
-
-	//all vertices
+void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup){
+    triangles.triangleMesh.setMode(OF_PRIMITIVE_LINES);
+    triangles.triangleMesh.enableIndices();
+    triangles.triangleMesh.enableTextures();
 	vector<ofVec3f> verts = triangles.triangleMesh.getVertices();
-
-	vector<int> vertexIndexesToDrop;
-	//walk the usedIndexes vector, when see a false, drop that vertex from the vector
-	//AND decrease by one all indices higher than the current in the indexTable
-	//this way we automagically have a selected triangles vector with correct indices
-	for( int i = 0 ; i < usedIndexes.size() ; i++ ){
-		if(usedIndexes[i] == false){ //this vertex not used
-			vertexIndexesToDrop.push_back(i);
-			for(int j = i; j < numIndices; j++){ //decrease all indexes ahead of me by one
-				indexTable[j]--;
-			}
-		}
-	}
-
-	//erase items from the final vertices vector the back
-	for( int i = vertexIndexesToDrop.size() - 1 ; i >= 0; i-- ){
-		verts.erase( verts.begin() + vertexIndexesToDrop[i]);
-	}
-
 	vector<ofVec2f> texCoords;
 	for( int i = 0 ; i < verts.size() ; i++ ){
 		texCoords.push_back(verts[i]);
 	}
-	m.addVertices(verts);
-	m.addTexCoords(texCoords);
-
-	for( int i = 0 ; i < selectedTriangles.size() ; i++ ){
-		TriangleIndexPtrs t = referencedIndexesTriangles[i];
-		m.addIndex(*t.p1); m.addIndex(*t.p2); m.addIndex(*t.p3);
-	}
-
-	pup.setup(m);
-	tri.reset();
-	free(indexTable);
+	triangles.triangleMesh.addTexCoords(texCoords);
+	pup.setup(triangles.triangleMesh);
 }
 
 
 void ofApp::setup(){
+    ofBackground(255, 227, 191);
 	ofSetVerticalSync(true);
 	puppet.setEvents(false);
     
-    bgImg.loadImage("bg.jpg");
-    contourImg.loadImage("picture0.jpg");
+    bgImg.loadImage("couple1/bg.jpg");
+    contourImg.loadImage("couple1/couple.jpg");
     contourImg.resize(contourImg.getWidth(), contourImg.getHeight());
-    
-    legImg.loadImage("picture0.png");
-    legImg.resize(legImg.getWidth(), legImg.getHeight());
+    puppetImg.loadImage("couple1/couple.png");
+    puppetImg.resize(puppetImg.getWidth(), puppetImg.getHeight());
     
     //imgTracker.update(ofxCv::toCv(legImg));
     
@@ -147,90 +43,71 @@ void ofApp::setup(){
     grayDiff.absDiff(grayBg, grayImage);
     grayDiff.threshold(100);
     contourFinder.findContours(grayDiff, 5, (contourImg.getWidth()*contourImg.getHeight())/4, 4, false, false);
+    
+    xml.loadFile("couple1/data.xml");
+    title = xml.getAttribute("data", "title", "");
+    date = xml.getAttribute("data", "date", "");
+    artist = xml.getAttribute("data", "artist", "");
+    culture = xml.getAttribute("data", "culture", "");
+    description = xml.getAttribute("data", "description", "");
+    
+    description = wrapText(description, 50);
+    title = wrapText(title, 15);
+    
+    titleFont.loadFont("font/Znikomit.otf", 46, true, true, true);
+    descriptionFont.loadFont("font/Didot-Light16.otf", 18, true, true, true);
+    descriptionFont.setLineHeight(35);
+    descriptionFont.setSpaceSize(0.7);
 }
 
 void ofApp::update(){
-
-    OFX_REMOTEUI_SERVER_UPDATE(1./60);
-
 	puppet.setScreenOffset(cameraOffset);
 	puppet.update();
-
-	vector<int> ids = puppet.getControlPointIDs();    
     cam.update();
     tracker.update(ofxCv::toCv(cam));
     
-	if(cam.isFrameNew() && ids.size() > 0) {
+	if(cam.isFrameNew() && puppet.getNumControlPoints() > 0) {
 		tracker.update(ofxCv::toCv(cam));
         if (tracker.getFound()){
-            
             if (isInit) {
-                for (int i = 0; i < 5; i++) {
-                    ofPoint p = tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i] - initLeftEye[i];
-                    diffLeftEye.push_back(p);
-                }
-                
-                for (int i = 0; i < 5; i++) {
-                    ofPoint p = tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i] - initRightEye[i];
-                    diffRightEye.push_back(p);
-                }
-                
-                for (int i = 2; i < 4; i++) {
-                    ofPoint p = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[i] - initNose[i - 2];
-                    diffNose.push_back(p);
-                }
+                for (int i = 0; i < coordFace.size(); i++) {
+                    ofPoint p;
+                    if (i < 5){
+                        p = tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i]      - coordFace[i];
+                    } else if (i < 10) {
+                        p = tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i - 5] - coordFace[i];
+                    } else if (i < 12) {
+                        p = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[i - 8]   - coordFace[i];
+                    } else if (i < 24) {
+                        p = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[i - 12]  - coordFace[i];
+                    }
+                    diffFace.push_back(p);
+                }                
                 isInit = false;
+            }            
+            for (int i = 0; i < indexFace.size(); i++) {
+                if (i < 5){
+                    puppet.setControlPoint(indexFace[i], tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[i] - diffFace[i]);
+                } else if (i < 10) {
+                    puppet.setControlPoint(indexFace[i], tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[i - 5] - diffFace[i]);
+                } else if (i < 12) {
+                    puppet.setControlPoint(indexFace[i], tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[i - 8] - diffFace[i]);
+                } else if (i < 24) {
+                    puppet.setControlPoint(indexFace[i], tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[i - 12] - diffFace[i]);
+                }
             }
-            for (int i = 0; i < 12; i++) {
-                ofPoint p = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[i] - initMouth[i];
-                diffMouth.push_back(p);
-            }
-            puppet.setControlPoint(0,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[0] - diffLeftEye[0]);
-            puppet.setControlPoint(1,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[1] - diffLeftEye[1]);
-            puppet.setControlPoint(2,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[2] - diffLeftEye[2]);
-            puppet.setControlPoint(3,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[3] - diffLeftEye[3]);
-            puppet.setControlPoint(4,   tracker.getImageFeature(tracker.LEFT_EYEBROW).getVertices()[4] - diffLeftEye[4]);
-            
-            puppet.setControlPoint(5,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[0] - diffRightEye[0]);
-            puppet.setControlPoint(6,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[1] - diffRightEye[1]);
-            puppet.setControlPoint(7,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[2] - diffRightEye[2]);
-            puppet.setControlPoint(8,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[3] - diffRightEye[3]);
-            puppet.setControlPoint(9,  tracker.getImageFeature(tracker.RIGHT_EYEBROW).getVertices()[4] - diffRightEye[4]);
-            
-            puppet.setControlPoint(10,  tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2] - diffNose[0]);
-            puppet.setControlPoint(11,  tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3] - diffNose[1]);
-            
-            puppet.setControlPoint(12,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[0] - diffMouth[0]);
-            puppet.setControlPoint(13,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[1] - diffMouth[1]);
-            puppet.setControlPoint(14,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2] - diffMouth[2]);
-            puppet.setControlPoint(15,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3] - diffMouth[3]);
-            puppet.setControlPoint(16,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4] - diffMouth[4]);
-            puppet.setControlPoint(17,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[5] - diffMouth[5]);
-            puppet.setControlPoint(18,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[6] - diffMouth[6]);
-            puppet.setControlPoint(19,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[7] - diffMouth[7]);
-            puppet.setControlPoint(20,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[8] - diffMouth[8]);
-            puppet.setControlPoint(21,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9] - diffMouth[9]);
-            puppet.setControlPoint(22,  tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[10] - diffMouth[10]);
-            puppet.setControlPoint(23,   tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[11] - diffMouth[11]);
-        
         }
-
 	}
-
-}
-
-void ofApp::exit(){
-	OFX_REMOTEUI_SERVER_CLOSE();
-	OFX_REMOTEUI_SERVER_SAVE_TO_XML();
 }
 
 
 void ofApp::draw(){
 	ofSetColor(255);
     bgImg.draw(0, 0);
+    //contourImg.draw(0, 0);
     cam.draw(15, 15, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
     if(!puppetMode){
-        legImg.draw(0,0, legImg.getWidth(), legImg.getHeight());
+        puppetImg.draw(0,0, puppetImg.getWidth(), puppetImg.getHeight());
     }
 
 	//anim guidelines
@@ -242,30 +119,23 @@ void ofApp::draw(){
 	}    
 
 	ofSetColor(255);
-	legImg.getTextureReference().bind();
+	puppetImg.getTextureReference().bind();
 	puppet.drawFaces();
-	legImg.getTextureReference().unbind();
-
+	puppetImg.getTextureReference().unbind();
+    
 	ofSetColor(128, 24);
 	if(drawMesh)puppet.drawWireframe();
 	if(drawIDs)puppet.drawVertexIDs();
 	if(drawCtrlpoints)puppet.drawControlPoints();
 
-	ofSetColor(0,255,128);
-	tri.triangleMesh.drawWireframe();
-	ofSetColor(255,0,0, 128);
-	glPointSize(3);
-	tri.triangleMesh.draw(OF_MESH_POINTS);
-	glPointSize(1);
-
-	//draw current tri selection
-	ofSetColor(255,0,0,64);
-	for( int i = 0 ; i < selectedTriangles.size() ; i++ ){
-		vector<ofPoint> pts = tri.getPointsForITriangle(selectedTriangles[i]);
-		ofBeginShape();
-			ofVertex(pts[0].x, pts[0].y);ofVertex(pts[1].x, pts[1].y);ofVertex(pts[2].x, pts[2].y);
-		ofEndShape();
-	}
+    if (!puppetMode) {
+        ofSetColor(0,255,128);
+        tri.triangleMesh.drawWireframe();
+        ofSetColor(255,0,0, 128);
+        glPointSize(3);
+        tri.triangleMesh.draw(OF_MESH_POINTS);
+        glPointSize(1);
+    }
 
 	//draw mouseover triangle
 	ofSetColor(0,255,255, 64 * fabs(cos(10 * ofGetElapsedTimef())));
@@ -282,9 +152,14 @@ void ofApp::draw(){
 	}
 
 	ofSetupScreen();
-	tri.draw();
+    if (!puppetMode) {
+        tri.draw();
+    }
     
     if (tracker.getFound()) {
+        ofSetColor(255);
+        //tracker.draw();
+        
         float x1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].x) / 2;
         float y1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].y + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].y) / 2;
         float x2 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[4].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4].x) / 2;
@@ -358,55 +233,72 @@ void ofApp::draw(){
     //grayDiff.draw(0, 240, 320, 240);
     //ofRect(320, 0, 320, 240);
     //contourFinder.draw(0, 0);
+    
+    
+    /*ofSetHexColor(0x111111);
+    ofRectangle rectT = myFont.getStringBoundingBox(title, 100, 1100);
+    ofRect(rectT.x - 2, rectT.y - 2, rectT.width + 4, rectT.height + 3);
+    ofRectangle rectA = myFont.getStringBoundingBox(artist + " (" + date + "), " + culture, 100, 1130);
+    ofRect(rectA.x - 2, rectA.y - 2, rectA.width + 4, rectA.height + 3);
+    ofRectangle rectD = myFont.getStringBoundingBox(description, 100, 1160);
+    ofRect(rectD.x - 2, rectD.y - 2, rectD.width + 4, rectD.height + 3);*/
+    
+    ofSetHexColor(0);
+    titleFont.drawString(ofToUpper(title), 1900, 325);
+    descriptionFont.drawString(artist + " (" + date + "), " + culture, 1900, 475);
+    descriptionFont.drawString(description, 1900, 550);
+
 }
 
 
 void ofApp::mousePressed( int x, int y, int button ){
+    if(puppetMode) return;
     
-    if (createMode) {
-        if (clicksRecorded < clicksThreshold)
-        {
-            if (clicksRecorded < 5) {
-                initLeftEye.push_back(ofPoint(x, y, 0));
-            } else if (clicksRecorded < 10) {
-                initRightEye.push_back(ofPoint(x, y, 0));
-            } else if (clicksRecorded < 12) {
-                initNose.push_back(ofPoint(x, y, 0));
-            } else if (clicksRecorded < 24) {
-                initMouth.push_back(ofPoint(x, y, 0));
-            }
-            
-            tri.addPoint(x,y, 0);
+    if(createMode) {
+        if (clicksRecorded < clicksThreshold) {
+            coordFace.push_back(ofPoint(x, y, 0));
+            tri.addPoint(x, y, 0);
         }
-        
-        if (clicksRecorded == clicksThreshold) {
-            for(int i = 0; i < contourFinder.blobs[0].pts.size(); i = i + 40) {
-                float cPointX = contourFinder.blobs[0].pts[i].x;
-                float cPointY = contourFinder.blobs[0].pts[i].y;
-                tri.addPoint(cPointX, cPointY, 0);
+        if (clicksRecorded == clicksThreshold - 1) {
+            for (int k = 0; k < contourFinder.blobs.size(); k++) {
+                int j = 0;
+                for(int i = 0; i < contourFinder.blobs[k].pts.size() - 3; i = i + 10) {
+                    float ax = contourFinder.blobs[k].pts[i].x;
+                    float ay = contourFinder.blobs[k].pts[i].y;
+                    
+                    float bx = contourFinder.blobs[k].pts[i + 1].x;
+                    float by = contourFinder.blobs[k].pts[i + 1].y;
+                    
+                    float cx = contourFinder.blobs[k].pts[i + 2].x;
+                    float cy = contourFinder.blobs[k].pts[i + 2].y;
+                    
+                    float top = ((ax - bx) * (cx - bx) + (ay - by) * (cy - by));
+                    float bot = sqrt( pow((ax - bx), 2) + pow((ay - by),2)) * sqrt( pow((bx - cx),2) + pow((by - cy),2));
+                    
+                    float angle = top / bot;
+                    if (angle > - 0.8) {
+                        tri.addPoint(bx, by, 0);
+                        j--;
+                    }
+                    if (j == 2) {
+                        tri.addPoint(bx, by, 0);
+                        j = 0;
+                    }
+                    j++;
+                }            
             }
-            contourPtsAdded = true;
-            tri.triangulate();
-            //saveMesh(tri, selectedTriangles);
-        }
-        
-        if (addArmsMode && contourPtsAdded && armPtsRecorded < 6) {
-            if (armPtsRecorded < 3) {
-                leftArm.push_back(mouseOverVertexIndex);
-                cout << "left arm \n";
-            } else {
-                rightArm.push_back(mouseOverVertexIndex);
-                cout << "right arm \n";
+            tri.addMidTris(puppetImg);
+            for(int i = 0; i < coordFace.size(); i++) {
+                tri.getPointNear(coordFace[i], SELECTION_DISTANCE, mouseOverVertexIndex);
+                indexFace.push_back(mouseOverVertexIndex);
             }
-            armPtsRecorded++;
+            createMode = false;
         }
-        //cout << clicksRecorded;
-        //cout << "\n";
+        cout << clicksRecorded;
+        cout << "\n";
         clicksRecorded++;
     }
     
-	if(puppetMode) return;
-
 	x -= cameraOffset.x;
 	y -= cameraOffset.y;
 
@@ -414,24 +306,19 @@ void ofApp::mousePressed( int x, int y, int button ){
 	if(button == 0) {
 		if (tempVertex.length() > 0.0f){ //mouse over a vertex
 			draggingVertex = true;
-			selectedTriangles.clear();
-		}
-	} else {
-		if (tempVertex.length() > 0.0f){ //mouse over a vertex
-            
-			selectedTriangles.clear();
-			tri.removePointAtIndex(mouseOverVertexIndex);
-			//tri.triangulate();
 		}
 	}
 }
+
 
 void ofApp::mouseReleased(int x, int y, int button ){
 	draggingVertex = false;
 }
 
-void ofApp::mouseDragged(int x, int y, int button){
 
+void ofApp::mouseDragged(int x, int y, int button){
+    if(puppetMode) return;
+    
 	if(button == 1){
 		cameraOffset.x += x - ofGetPreviousMouseX();
 		cameraOffset.y += y - ofGetPreviousMouseY();
@@ -440,17 +327,14 @@ void ofApp::mouseDragged(int x, int y, int button){
 	x -= cameraOffset.x;
 	y -= cameraOffset.y;
 
-	if(puppetMode) return;
-	
 	if(draggingVertex){
 		tempVertex = ofVec2f(x,y);
-		tri.setPointAtIndex(tempVertex, mouseOverVertexIndex);
+		tri.setPointAtIndex(tempVertex, mouseOverVertexIndex, puppetImg);
 	}
-
 }
 
-void ofApp::mouseMoved( int x, int y ){
 
+void ofApp::mouseMoved( int x, int y ){
 	if(puppetMode) return;
 
 	x -= cameraOffset.x;
@@ -458,8 +342,6 @@ void ofApp::mouseMoved( int x, int y ){
 
 	if (tri.getNumPoints() > 2) {
 		tempVertex = tri.getPointNear(ofVec2f(x,y), SELECTION_DISTANCE, mouseOverVertexIndex);
-        //cout << mouseOverVertexIndex;
-        //cout << "\n";
 		if (tempVertex.length() == 0.0f){ // only select triangles if not selectng vertexs
 			ITRIANGLE t = tri.getTriangleForPos(ofPoint(x,y));
 			vector<ofPoint> pts = tri.getPointsForITriangle(t);
@@ -472,48 +354,23 @@ void ofApp::mouseMoved( int x, int y ){
 
 
 void ofApp::keyPressed( int key ){
-
-	ITRIANGLE zero;
-
 	switch(key){
-		case 's': saveMesh(tri, selectedTriangles); break;
-		case 'l': loadMesh(tri, selectedTriangles); tri.triangulate(); break;
+		case 's': saveMesh(tri); break;
+		case 'l': {
+            loadMesh(tri);
+            tri.triangulate(puppetImg);
+        } break;
         case 'p': {
-            selectedTriangles.clear();
-            int nTri = tri.getNumTriangles();
-            for (int i = 0; i < nTri ; i++){
-                ITRIANGLE ti = tri.getTriangleAtIndex(i);
-                //if (ti != zero){
-                    selectedTriangles.push_back(ti);
-                //}
-            }
-            makePuppetFromSelectedTriangleMesh(tri, selectedTriangles, puppet);
-			clear();
+            makePuppetFromSelectedTriangleMesh(tri, puppet);
 			puppetMode = true;
 			puppet.setEvents(true);
-            for (int i = 0; i < 24; i++){
-                puppet.setControlPoint(i);
+            for (int i = 0; i < indexFace.size(); i++){
+                puppet.setControlPoint(indexFace[i]);
             }
-            selectedTriangles.clear();
         } break;
-        
-        case 'o': {        
-            for(int i = 0; i < contourFinder.blobs[0].pts.size(); i = i + 40) {
-                float cPointX = contourFinder.blobs[0].pts[i].x;
-                float cPointY = contourFinder.blobs[0].pts[i].y;
-                tri.addPoint(cPointX, cPointY, 0);
-            }
-            contourPtsAdded = true;
-            tri.triangulate();
-        } break;
-            
         case 'c' : {
             createMode = true;
-        } break;
-        case 'a' : {
-            addArmsMode = true;
-        } break;
-        
+        } break;        
         // restart beard detection
         case 'r' : {
             count = 0;
@@ -531,82 +388,66 @@ void ofApp::keyPressed( int key ){
 }
 
 
-void ofApp::clear(){
-	tri.reset();
-	selectedTriangles.clear();
-	tt = Triangle();
-	tempVertex = ofVec2f();
-}
-
-
-void ofApp::saveMesh(ofxDelaunay & t, vector<ITRIANGLE> & selected){
-    
+void ofApp::saveMesh(ofxDelaunay & t){
 	ofxXmlSettings xml;
-
 	xml.loadFile(MESH_XML_FILENAME);
 	xml.clear();
-	int nP = t.triangleMesh.getNumVertices();
-	for(int i = 0; i < nP; i++){
+	for (int i = 0; i < t.triangleMesh.getNumVertices(); i++){
 		ofVec3f * pts = t.triangleMesh.getVerticesPointer();
-		xml.addTag(XML_TAG_POINT_NAME);
-		xml.setAttribute(XML_TAG_POINT_NAME, "x", pts[i].x, i);
-		xml.setAttribute(XML_TAG_POINT_NAME, "y", pts[i].y, i);
+		xml.addTag(XML_TAG_MESH_POINT);
+		xml.setAttribute(XML_TAG_MESH_POINT, "x", pts[i].x, i);
+		xml.setAttribute(XML_TAG_MESH_POINT, "y", pts[i].y, i);
 	}
-
-	ITRIANGLE zero;
-	for(int i = 0; i < selectedTriangles.size() ; i++){
-		ITRIANGLE ti = selectedTriangles[i];
-		if (ti != zero){
-			xml.addTag(XML_TAG_SELECTION_TRIANGLE_NAME);
-			xml.setAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p1", ti.p1, i);
-			xml.setAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p2", ti.p2, i);
-			xml.setAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p3", ti.p3, i);
-		}
-	}
-
+    for (int i = 0; i < coordFace.size(); i++){
+        xml.addTag(XML_TAG_FACE_POINT);
+        xml.setAttribute(XML_TAG_FACE_POINT, "x", coordFace[i].x, i);
+        xml.setAttribute(XML_TAG_FACE_POINT, "y", coordFace[i].y, i);
+    }
+    for (int i = 0; i < indexFace.size(); i++){
+        xml.addTag(XML_TAG_FACE_INDEX);
+        xml.setAttribute(XML_TAG_FACE_INDEX, "i", indexFace[i], i);
+    }
 	xml.saveFile(MESH_XML_FILENAME);
 }
 
 
-void ofApp::loadMesh(ofxDelaunay & t, vector<ITRIANGLE> & selected){
-
+void ofApp::loadMesh(ofxDelaunay & t){
 	tri.reset();
-	selectedTriangles.clear();
 	ofxXmlSettings xml;
-
 	xml.loadFile(MESH_XML_FILENAME);
-	int numPts = xml.getNumTags(XML_TAG_POINT_NAME);
-	for (int i=0; i< numPts; i++){
-		float x = xml.getAttribute(XML_TAG_POINT_NAME, "x", 0.0, i);
-		float y = xml.getAttribute(XML_TAG_POINT_NAME, "y", 0.0, i);
-		tri.addPoint(x,y, 0);
-        
-        if (i < 5) {
-            initLeftEye.push_back(ofPoint(x, y, 0));
-        } else if (i < 10) {
-            initRightEye.push_back(ofPoint(x, y, 0));
-        } else if (i < 12) {
-            initNose.push_back(ofPoint(x, y, 0));
-        } else if (i < 24) {
-            initMouth.push_back(ofPoint(x, y, 0));
+	for (int i = 0; i < xml.getNumTags(XML_TAG_MESH_POINT); i++){
+		float x = xml.getAttribute(XML_TAG_MESH_POINT, "x", 0.0, i);
+		float y = xml.getAttribute(XML_TAG_MESH_POINT, "y", 0.0, i);
+		tri.addPoint(x, y, 0);
+	}
+    for (int i = 0; i < xml.getNumTags(XML_TAG_FACE_POINT); i++){
+		float x = xml.getAttribute(XML_TAG_FACE_POINT, "x", 0.0, i);
+		float y = xml.getAttribute(XML_TAG_FACE_POINT, "y", 0.0, i);
+        coordFace.push_back(ofPoint(x, y, 0));
+	}
+    for (int i = 0; i < xml.getNumTags(XML_TAG_FACE_INDEX); i++){
+        int index = xml.getAttribute(XML_TAG_FACE_INDEX, "i", 0.0, i);
+        indexFace.push_back(index);
+    }
+}
+
+string ofApp::wrapText(string text, int maxChars) {
+    int currentChars = 0;
+    stringstream textStream(text);
+    string word;
+    string wrappedText = "";
+    
+    for (int i = 0; textStream >> word; i++)
+    {
+        wrappedText = wrappedText + word + " ";
+        currentChars = currentChars + word.size() + 1;
+        if (currentChars >= maxChars) {
+            wrappedText = wrappedText + "\n";
+            currentChars = 0;
         }
-	}
-
-	ITRIANGLE zero;
-	int numT = xml.getNumTags(XML_TAG_SELECTION_TRIANGLE_NAME);
-	for (int i=0; i< numT; i++){
-		ITRIANGLE t;
-		t.p1 = xml.getAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p1", 0, i);
-		t.p2 = xml.getAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p2", 0, i);
-		t.p3 = xml.getAttribute(XML_TAG_SELECTION_TRIANGLE_NAME, "p3", 0, i);
-		if (t != zero){
-			selectedTriangles.push_back(t);
-		}
-	}
+    }
+    
+    return wrappedText;
 }
 
-
-bool ofApp::triangleInVector(const vector<ITRIANGLE> &selectedTriangles, ITRIANGLE t ){
-	return std::find(selectedTriangles.begin(), selectedTriangles.end(), t) != selectedTriangles.end();
-}
 

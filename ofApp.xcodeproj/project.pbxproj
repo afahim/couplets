@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		169d3c72fde6c5590a1616f500a456b4 /* ofxCvFloatImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7b6a03390302d5a2c9f0e4ab630ae8d6 /* ofxCvFloatImage.cpp */; };
+		1C03239F18FF09A8001A7751 /* triangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C03238B18FF09A8001A7751 /* triangle.cpp */; };
+		1C0323A018FF09A8001A7751 /* ofxTriangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C03238F18FF09A8001A7751 /* ofxTriangle.cpp */; };
 		1C530DFA18E4D7F1006016D7 /* Delaunay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DED18E4D7F1006016D7 /* Delaunay.cpp */; };
 		1C530DFB18E4D7F1006016D7 /* ofxDelaunay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530DF118E4D7F1006016D7 /* ofxDelaunay.cpp */; };
 		1C530EDD18E4DA43006016D7 /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C530E9E18E4DA43006016D7 /* ofxRemoteUI.cpp */; };
@@ -139,6 +141,10 @@
 		096cb33cad6c5a446e7026e9ff234dc2 /* dynamic_bitset.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = dynamic_bitset.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/dynamic_bitset.h; sourceTree = SOURCE_ROOT; };
 		0cf0aa3895d28e97d8a1e4a938976234 /* ground_truth.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ground_truth.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/ground_truth.h; sourceTree = SOURCE_ROOT; };
 		114b872696817cc33990fc83feb1259e /* imgproc.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = imgproc.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc.hpp; sourceTree = SOURCE_ROOT; };
+		1C03238B18FF09A8001A7751 /* triangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = triangle.cpp; sourceTree = "<group>"; };
+		1C03238C18FF09A8001A7751 /* triangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = triangle.h; sourceTree = "<group>"; };
+		1C03238F18FF09A8001A7751 /* ofxTriangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTriangle.cpp; sourceTree = "<group>"; };
+		1C03239018FF09A8001A7751 /* ofxTriangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTriangle.h; sourceTree = "<group>"; };
 		1C530DED18E4D7F1006016D7 /* Delaunay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Delaunay.cpp; sourceTree = "<group>"; };
 		1C530DEE18E4D7F1006016D7 /* Delaunay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delaunay.h; sourceTree = "<group>"; };
 		1C530DF118E4D7F1006016D7 /* ofxDelaunay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxDelaunay.cpp; sourceTree = "<group>"; };
@@ -483,6 +489,41 @@
 				a0399084868e7cafb7e3d8e975d55095 /* retina.hpp */,
 			);
 			name = contrib;
+			sourceTree = "<group>";
+		};
+		1C03237118FF09A8001A7751 /* ofxTriangle */ = {
+			isa = PBXGroup;
+			children = (
+				1C03238918FF09A8001A7751 /* libs */,
+				1C03238E18FF09A8001A7751 /* src */,
+			);
+			path = ofxTriangle;
+			sourceTree = "<group>";
+		};
+		1C03238918FF09A8001A7751 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				1C03238A18FF09A8001A7751 /* Triangle */,
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
+		1C03238A18FF09A8001A7751 /* Triangle */ = {
+			isa = PBXGroup;
+			children = (
+				1C03238B18FF09A8001A7751 /* triangle.cpp */,
+				1C03238C18FF09A8001A7751 /* triangle.h */,
+			);
+			path = Triangle;
+			sourceTree = "<group>";
+		};
+		1C03238E18FF09A8001A7751 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				1C03238F18FF09A8001A7751 /* ofxTriangle.cpp */,
+				1C03239018FF09A8001A7751 /* ofxTriangle.h */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 		1C530DDF18E4D7F1006016D7 /* ofxDelaunay */ = {
@@ -968,6 +1009,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				1C03237118FF09A8001A7751 /* ofxTriangle */,
 				1C5310BB18E4DF82006016D7 /* ofxCv */,
 				1C530F7B18E4DE7E006016D7 /* ofxFaceTracker */,
 				1C530DFF18E4DA43006016D7 /* ofxRemoteUI */,
@@ -1446,6 +1488,8 @@
 				1C5313FD18E4DF85006016D7 /* Tracker.cpp in Sources */,
 				1C5313FE18E4DF85006016D7 /* Utilities.cpp in Sources */,
 				1C5313FF18E4DF85006016D7 /* Wrappers.cpp in Sources */,
+				1C03239F18FF09A8001A7751 /* triangle.cpp in Sources */,
+				1C0323A018FF09A8001A7751 /* ofxTriangle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
