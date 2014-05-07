@@ -15,21 +15,46 @@ void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppe
 
 
 void ofApp::setup(){
+    screenWidth = ofGetWindowSize().x;
+    screenHeight = ofGetWindowSize().y;
+    
     ofBackground(255, 227, 191);
 	ofSetVerticalSync(true);
 	puppet.setEvents(false);
     
-    bgImg.loadImage("couple1/bg.jpg");
-    contourImg.loadImage("couple1/couple.jpg");
-    contourImg.resize(contourImg.getWidth(), contourImg.getHeight());
-    puppetImg.loadImage("couple1/couple.png");
-    puppetImg.resize(puppetImg.getWidth(), puppetImg.getHeight());
+    bgImg.loadImage(meshFolderName + "/bg.jpg");
+    contourImg.loadImage(meshFolderName + "/couple.jpg");
+    puppetImg.loadImage(meshFolderName + "/couple.png");    
     
-    //imgTracker.update(ofxCv::toCv(legImg));
+    xml.loadFile(meshFolderName + "/data.xml");
+    title = ofToUpper(xml.getAttribute("data", "title", ""));
+    date = xml.getAttribute("data", "date", "");
+    artist = xml.getAttribute("data", "artist", "");
+    culture = xml.getAttribute("data", "culture", "");
+    description = xml.getAttribute("data", "description", "");
+    fit = xml.getAttribute("data", "fit", "");
+
+    if (fit == "width") {
+        float occupyingWidth = 0.75 * screenWidth;
+        
+        if (bgImg.getWidth() > occupyingWidth) {
+            float resizeRatio = occupyingWidth / bgImg.getWidth();
+            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+        }
+    } else {
+        if (bgImg.getHeight() > screenHeight) {
+            float resizeRatio = screenHeight / bgImg.getHeight();
+            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+        }
+    }
     
-	draggingVertex = false;
+    draggingVertex = false;
 	puppetMode = false;
-   
+    
     cam.initGrabber(1280, 780);
 	tracker.setup();
     
@@ -37,19 +62,12 @@ void ofApp::setup(){
     grayImage.allocate(contourImg.getWidth(),contourImg.getHeight());
     grayBg.allocate(contourImg.getWidth(),contourImg.getHeight());
     grayDiff.allocate(contourImg.getWidth(),contourImg.getHeight());
-
+    
     colorImg.setFromPixels(contourImg.getPixelsRef());
     grayImage = colorImg; // convert our color image to a grayscale image
     grayDiff.absDiff(grayBg, grayImage);
     grayDiff.threshold(100);
     contourFinder.findContours(grayDiff, 5, (contourImg.getWidth()*contourImg.getHeight())/4, 4, false, false);
-    
-    xml.loadFile("couple1/data.xml");
-    title = xml.getAttribute("data", "title", "");
-    date = xml.getAttribute("data", "date", "");
-    artist = xml.getAttribute("data", "artist", "");
-    culture = xml.getAttribute("data", "culture", "");
-    description = xml.getAttribute("data", "description", "");
     
     description = wrapText(description, 50);
     title = wrapText(title, 15);
@@ -58,6 +76,13 @@ void ofApp::setup(){
     descriptionFont.loadFont("font/Didot-Light16.otf", 18, true, true, true);
     descriptionFont.setLineHeight(35);
     descriptionFont.setSpaceSize(0.7);
+    
+    titleXPos = 325;
+    textYPos = 1950;
+    titleBox = titleFont.getStringBoundingBox(title, textYPos, titleXPos);
+    artistXPos = titleXPos + titleBox.height + 35;
+    artistBox = titleFont.getStringBoundingBox(artist + " (" + date + "), " + culture, textYPos, artistXPos);
+    descriptionXPos = artistXPos + artistBox.height + 30;
 }
 
 void ofApp::update(){
@@ -105,7 +130,8 @@ void ofApp::draw(){
 	ofSetColor(255);
     bgImg.draw(0, 0);
     //contourImg.draw(0, 0);
-    cam.draw(15, 15, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
+    
+    cam.draw(screenWidth - 300, screenHeight - 190, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
     if(!puppetMode){
         puppetImg.draw(0,0, puppetImg.getWidth(), puppetImg.getHeight());
     }
@@ -242,12 +268,11 @@ void ofApp::draw(){
     ofRect(rectA.x - 2, rectA.y - 2, rectA.width + 4, rectA.height + 3);
     ofRectangle rectD = myFont.getStringBoundingBox(description, 100, 1160);
     ofRect(rectD.x - 2, rectD.y - 2, rectD.width + 4, rectD.height + 3);*/
-    
+        
     ofSetHexColor(0);
-    titleFont.drawString(ofToUpper(title), 1900, 325);
-    descriptionFont.drawString(artist + " (" + date + "), " + culture, 1900, 475);
-    descriptionFont.drawString(description, 1900, 550);
-
+    titleFont.drawString(title, textYPos, titleXPos);
+    descriptionFont.drawString(artist + " (" + date + "), " + culture, textYPos, artistXPos);
+    descriptionFont.drawString(description, textYPos, descriptionXPos);
 }
 
 
@@ -389,8 +414,9 @@ void ofApp::keyPressed( int key ){
 
 
 void ofApp::saveMesh(ofxDelaunay & t){
+    string xmlName = meshFolderName + "/coupleMesh.xml";
 	ofxXmlSettings xml;
-	xml.loadFile(MESH_XML_FILENAME);
+	xml.loadFile(xmlName);
 	xml.clear();
 	for (int i = 0; i < t.triangleMesh.getNumVertices(); i++){
 		ofVec3f * pts = t.triangleMesh.getVerticesPointer();
@@ -407,14 +433,15 @@ void ofApp::saveMesh(ofxDelaunay & t){
         xml.addTag(XML_TAG_FACE_INDEX);
         xml.setAttribute(XML_TAG_FACE_INDEX, "i", indexFace[i], i);
     }
-	xml.saveFile(MESH_XML_FILENAME);
+	xml.saveFile(xmlName);
 }
 
 
 void ofApp::loadMesh(ofxDelaunay & t){
+    string xmlName = meshFolderName + "/coupleMesh.xml";
 	tri.reset();
 	ofxXmlSettings xml;
-	xml.loadFile(MESH_XML_FILENAME);
+	xml.loadFile(xmlName);
 	for (int i = 0; i < xml.getNumTags(XML_TAG_MESH_POINT); i++){
 		float x = xml.getAttribute(XML_TAG_MESH_POINT, "x", 0.0, i);
 		float y = xml.getAttribute(XML_TAG_MESH_POINT, "y", 0.0, i);
@@ -431,19 +458,25 @@ void ofApp::loadMesh(ofxDelaunay & t){
     }
 }
 
+//A Woman With A Man
+
 string ofApp::wrapText(string text, int maxChars) {
     int currentChars = 0;
+    int potentialChars = 0;
     stringstream textStream(text);
     string word;
     string wrappedText = "";
     
     for (int i = 0; textStream >> word; i++)
     {
-        wrappedText = wrappedText + word + " ";
-        currentChars = currentChars + word.size() + 1;
-        if (currentChars >= maxChars) {
-            wrappedText = wrappedText + "\n";
-            currentChars = 0;
+        potentialChars = currentChars + word.size() + 1;
+                
+        if (potentialChars >= maxChars) {
+            wrappedText = wrappedText + "\n" + word + " ";
+            currentChars = word.size() + 1;
+        } else {
+            wrappedText = wrappedText + word + " ";
+            currentChars = potentialChars;
         }
     }
     

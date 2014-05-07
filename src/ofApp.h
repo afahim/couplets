@@ -12,7 +12,6 @@
 #define XML_TAG_MESH_POINT  "meshPoint"
 #define XML_TAG_FACE_POINT  "facePoint"
 #define XML_TAG_FACE_INDEX  "faceIndex"
-#define MESH_XML_FILENAME   "trianglePoints.xml"
 #define SELECTION_DISTANCE  5
 
 struct Triangle{
@@ -31,6 +30,8 @@ struct TriangleIndexPtrs{
 class ofApp : public ofBaseApp{
 
 public:
+    string meshFolderName = "couple4";
+    
 	void setup();
 	void update();
 	void draw();
@@ -45,7 +46,7 @@ public:
     void makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup);
     void saveMesh(ofxDelaunay & points);
 	void loadMesh(ofxDelaunay & points);
-    string ofApp::wrapText(string loadedText, int maxChars);
+    string wrapText(string loadedText, int maxChars);
 
 	ofxPuppetInteractive puppet;
 	ofxDelaunay tri;
@@ -57,6 +58,9 @@ public:
 	ofVec2f tempVertex;
 	int mouseOverVertexIndex; //index of the vertex that we are mouseOvering on, otherwise -1
 
+    float screenWidth;
+    float screenHeight;
+    
 	bool draggingVertex;
 	bool puppetMode;
     bool createMode = false;
@@ -114,5 +118,15 @@ public:
     string artist;
     string culture;
     string description;
+    string fit;
+    
+    bool fitByHeight;
+    
+    int titleXPos;
+    int textYPos;
+    int artistXPos;
+    int descriptionXPos;
 
+    ofRectangle titleBox;
+    ofRectangle artistBox;
 };
