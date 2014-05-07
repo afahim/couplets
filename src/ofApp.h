@@ -30,7 +30,7 @@ struct TriangleIndexPtrs{
 class ofApp : public ofBaseApp{
 
 public:
-    string meshFolderName = "couple4";
+    string meshFolderName = "couple6";
     
 	void setup();
 	void update();

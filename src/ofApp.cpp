@@ -13,7 +13,6 @@ void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppe
 	pup.setup(triangles.triangleMesh);
 }
 
-
 void ofApp::setup(){
     screenWidth = ofGetWindowSize().x;
     screenHeight = ofGetWindowSize().y;
@@ -33,7 +32,8 @@ void ofApp::setup(){
     culture = xml.getAttribute("data", "culture", "");
     description = xml.getAttribute("data", "description", "");
     fit = xml.getAttribute("data", "fit", "");
-
+    fit = "height";
+    
     if (fit == "width") {
         float occupyingWidth = 0.75 * screenWidth;
         
@@ -181,94 +181,7 @@ void ofApp::draw(){
     if (!puppetMode) {
         tri.draw();
     }
-    
-    if (tracker.getFound()) {
-        ofSetColor(255);
-        //tracker.draw();
-        
-        float x1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].x) / 2;
-        float y1 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[0].y + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[2].y) / 2;
-        float x2 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[4].x + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4].x) / 2;
-        float y2 = (tracker.getImageFeature(tracker.NOSE_BASE).getVertices()[4].y + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[4].y) / 2;
-        float x3 = ((tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].x + tracker.getImageFeature(tracker.JAW).getVertices()[8].x) / 2 + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].x) / 2;
-        float y3 = ((tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].y + tracker.getImageFeature(tracker.JAW).getVertices()[8].y) / 2 + tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[9].y) / 2;
-        
-        ofPixels px = cam.getPixelsRef();
-        ofColor c1 = px.getColor(x1, y1);
-        ofColor c2 = px.getColor(x2, y2);
-        ofColor c3 = px.getColor(x3, y3);
-        
-        int n1 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2].x;
-        int n2 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[2].y;
-        int n3 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3].x;
-        int n4 = tracker.getImageFeature(tracker.NOSE_BRIDGE).getVertices()[3].y;
-        ofColor c4 = px.getColor(n1, n2);
-        ofColor c5 = px.getColor(n3, n4);
-        
-        count ++;
-        
-        avgBri = (avgBri * (count - 1) + (c1.getBrightness() + c2.getBrightness() + c3.getBrightness()) / 3) / count;
-        avgLight = (avgLight * (count - 1) + (c1.getLightness() + c2.getLightness() + c3.getLightness()) / 3) / count;
-        
-        noseBri = (noseBri * (count - 1) + (c4.getBrightness() + c5.getBrightness()) / 2) / count;
-        noseLight = (noseLight * (count - 1) + (c4.getLightness() + c5.getLightness()) / 2) / count;
-        
-        float x4 = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3].x;
-        float y4 = tracker.getImageFeature(tracker.OUTER_MOUTH).getVertices()[3].y;
-        float x5 = tracker.getImageFeature(tracker.JAW).getVertices()[8].x;
-        float y5 = tracker.getImageFeature(tracker.JAW).getVertices()[8].y;
-        float topX = (x4 + x5) / 2;
-        float topY = y4 + y5;
-        if (cam.getHeight() < topY) {
-            topY = cam.getHeight() - 2;
-        }
-        ofColor topColor = px.getColor(topX, topY);
-        avgTopColorR += topColor.r;
-        avgTopColorB += topColor.b;
-        avgTopColorG += topColor.g;
-        
-        if (count == 50) {
-            int bright = int(noseBri - avgBri);
-            int light = int(noseLight - avgLight);
-            if (bright < 50 && light < 50) {
-                cout << "YOU DON'T HAVE A BEARD!";
-                cout << "\n";
-            } else {
-                cout << "YOU HAVE A BEARD!";
-                cout << "\n";
-            }
-            avgTopColor = ofColor(avgTopColorR/50, avgTopColorB/50, avgTopColorG/50);
-        }
-        
-        if (count > 50) {
-            ofSetColor(avgTopColor.r, avgTopColor.b, avgTopColor.g, 160);
-            if (puppetTorso.size() == 4 && puppetMode) {
-                ofSetPolyMode(OF_POLY_WINDING_NONZERO);
-                ofBeginShape();
-                for (int i =  0; i <  puppetTorso.size(); i++) {
-                    ofPoint p = puppet.getDeformedMesh().getVertices()[i+24];
-                    ofVertex(p.x, p.y);
-                }
-                ofEndShape();
-            }
-        }
-    }
-    
-    //ofSetHexColor(0xffffff);
-    //colorImg.draw(0, 0, 320, 240);
-    //grayDiff.draw(0, 240, 320, 240);
-    //ofRect(320, 0, 320, 240);
-    //contourFinder.draw(0, 0);
-    
-    
-    /*ofSetHexColor(0x111111);
-    ofRectangle rectT = myFont.getStringBoundingBox(title, 100, 1100);
-    ofRect(rectT.x - 2, rectT.y - 2, rectT.width + 4, rectT.height + 3);
-    ofRectangle rectA = myFont.getStringBoundingBox(artist + " (" + date + "), " + culture, 100, 1130);
-    ofRect(rectA.x - 2, rectA.y - 2, rectA.width + 4, rectA.height + 3);
-    ofRectangle rectD = myFont.getStringBoundingBox(description, 100, 1160);
-    ofRect(rectD.x - 2, rectD.y - 2, rectD.width + 4, rectD.height + 3);*/
-        
+                
     ofSetHexColor(0);
     titleFont.drawString(title, textYPos, titleXPos);
     descriptionFont.drawString(artist + " (" + date + "), " + culture, textYPos, artistXPos);
@@ -319,8 +232,6 @@ void ofApp::mousePressed( int x, int y, int button ){
             }
             createMode = false;
         }
-        cout << clicksRecorded;
-        cout << "\n";
         clicksRecorded++;
     }
     
@@ -396,20 +307,7 @@ void ofApp::keyPressed( int key ){
         case 'c' : {
             createMode = true;
         } break;        
-        // restart beard detection
-        case 'r' : {
-            count = 0;
-            avgHue = 0;
-            avgBri = 0;
-            avgLight = 0;
-            noseHue = 0;
-            noseBri = 0;
-            noseLight = 0;
-            avgTopColorR = 0;
-            avgTopColorB = 0;
-            avgTopColorG = 0;
-        }
-	}
+    }
 }
 
 
@@ -458,8 +356,6 @@ void ofApp::loadMesh(ofxDelaunay & t){
     }
 }
 
-//A Woman With A Man
-
 string ofApp::wrapText(string text, int maxChars) {
     int currentChars = 0;
     int potentialChars = 0;
@@ -482,5 +378,3 @@ string ofApp::wrapText(string text, int maxChars) {
     
     return wrappedText;
 }
-
-
