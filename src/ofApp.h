@@ -31,7 +31,7 @@ class ofApp : public ofBaseApp{
 
 public:
     int currentCouple = 0;
-    int totalCouples = 15;
+    int totalCouples = 7;
     string meshFolderPrefix = "couple";
     string meshFolderName;
     

@@ -1,8 +1,9 @@
 <data
-    title="Portrait of a Man and a Dancer"
-    date="19th century"
-    artist="Ahmad"
-    culture="Iran"
-    description="The development of the painter's style can be traced by a comparison of paintings from different stages in his career. An early signed painting of his of a seated Fath 'Ali Shah demonstrates a profound interest in the detail of jewelled surfaces and patterning, but little modelling or shading. A slightly later pair of paintings of acrobats, attributed to him is in the Victoria and Albert Museum. Painted with a warmer palate closer to that of his later works, and with very slight shading in parts, they still give the impression of a flat patterned surface."
-    fit="width"
+    title="At the Well on New Year's Morning"
+    date="1799"
+    artist="Suzuki Harunobu"
+    culture="Japanese"
+    description="Deepening the charm of the scene is the implicit eroticism of the first stirring of young love, as the couple's eyes meet. Felicitous seasonal symbolism disguised as a natural setting appears in the glimpse of flowering prunus above the wall of fresh bamboo. These are spring's first blossoms and herald the beginning of the year, which coincided with the first day of spring according to the lunar calendar used in Japan until the end of the Edo period."
+    fit="height"
+    foreground="true"
 ></data>

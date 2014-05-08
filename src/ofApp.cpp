@@ -126,7 +126,7 @@ void ofApp::draw(){
     
     cam.draw(screenWidth - 300, screenHeight - 190, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
     
-    if(currentCouple == 0) {
+    if(currentCouple == 0 || currentCouple == 1) {
         ofSetHexColor(0);
         titleFont.drawString(title, titleXPos, titleYPos);
         descriptionFont.drawString(artist, artistXPos, titleYPos + 100);
@@ -162,20 +162,6 @@ void ofApp::draw(){
 	}    
 
     
-	/*ofSetColor(128, 24);
-	if(drawMesh)puppet.drawWireframe();
-	if(drawIDs)puppet.drawVertexIDs();
-	if(drawCtrlpoints)puppet.drawControlPoints();
-
-    if (!puppetMode) {
-        ofSetColor(0,255,128);
-        tri.triangleMesh.drawWireframe();
-        ofSetColor(255,0,0, 128);
-        glPointSize(3);
-        tri.triangleMesh.draw(OF_MESH_POINTS);
-        glPointSize(1);
-    }*/
-
 	ofSetupScreen();
     if (!puppetMode) {
         tri.draw();
@@ -220,7 +206,7 @@ void ofApp::animateCouple(int coupleID) {
     
     bgImg = allBgs[currentCouple];
     
-    if(coupleID == 0) { //Landing page
+    if(coupleID == 0 || coupleID == 1) { //Landing page
         showLandingPage();
         return;
     }
