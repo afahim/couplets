@@ -1,18 +1,5 @@
 #include "ofApp.h"
 
-void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup){
-    triangles.triangleMesh.setMode(OF_PRIMITIVE_LINES);
-    triangles.triangleMesh.enableIndices();
-    triangles.triangleMesh.enableTextures();
-	vector<ofVec3f> verts = triangles.triangleMesh.getVertices();
-	vector<ofVec2f> texCoords;
-	for( int i = 0 ; i < verts.size() ; i++ ){
-		texCoords.push_back(verts[i]);
-	}
-	triangles.triangleMesh.addTexCoords(texCoords);
-	pup.setup(triangles.triangleMesh);
-}
-
 void ofApp::setup(){
     screenWidth = ofGetWindowSize().x;
     screenHeight = ofGetWindowSize().y;
@@ -21,78 +8,28 @@ void ofApp::setup(){
 	ofSetVerticalSync(true);
 	puppet.setEvents(false);
     
-    bgImg.loadImage(meshFolderName + "/bg.jpg");
-    contourImg.loadImage(meshFolderName + "/couple.jpg");
-    puppetImg.loadImage(meshFolderName + "/couple.png");    
-    
-    xml.loadFile(meshFolderName + "/data.xml");
-    title = ofToUpper(xml.getAttribute("data", "title", ""));
-    date = xml.getAttribute("data", "date", "");
-    artist = xml.getAttribute("data", "artist", "");
-    culture = xml.getAttribute("data", "culture", "");
-    description = xml.getAttribute("data", "description", "");
-    fit = xml.getAttribute("data", "fit", "");
-    fit = "height";
-    
-    if (fit == "width") {
-        float occupyingWidth = 0.75 * screenWidth;
-        
-        if (bgImg.getWidth() > occupyingWidth) {
-            float resizeRatio = occupyingWidth / bgImg.getWidth();
-            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
-            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
-            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
-        }
-    } else {
-        if (bgImg.getHeight() > screenHeight) {
-            float resizeRatio = screenHeight / bgImg.getHeight();
-            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
-            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
-            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
-        }
-    }
-    
     draggingVertex = false;
 	puppetMode = false;
     
     cam.initGrabber(1280, 780);
 	tracker.setup();
     
-    colorImg.allocate(contourImg.getWidth(),contourImg.getHeight());
-    grayImage.allocate(contourImg.getWidth(),contourImg.getHeight());
-    grayBg.allocate(contourImg.getWidth(),contourImg.getHeight());
-    grayDiff.allocate(contourImg.getWidth(),contourImg.getHeight());
-    
-    colorImg.setFromPixels(contourImg.getPixelsRef());
-    grayImage = colorImg; // convert our color image to a grayscale image
-    grayDiff.absDiff(grayBg, grayImage);
-    grayDiff.threshold(100);
-    contourFinder.findContours(grayDiff, 5, (contourImg.getWidth()*contourImg.getHeight())/4, 4, false, false);
-    
-    description = wrapText(description, 50);
-    title = wrapText(title, 15);
-    
     titleFont.loadFont("font/Znikomit.otf", 46, true, true, true);
     descriptionFont.loadFont("font/Didot-Light16.otf", 18, true, true, true);
     descriptionFont.setLineHeight(35);
     descriptionFont.setSpaceSize(0.7);
     
-    titleXPos = 325;
-    textYPos = 1950;
-    titleBox = titleFont.getStringBoundingBox(title, textYPos, titleXPos);
-    artistXPos = titleXPos + titleBox.height + 35;
-    artistBox = titleFont.getStringBoundingBox(artist + " (" + date + "), " + culture, textYPos, artistXPos);
-    descriptionXPos = artistXPos + artistBox.height + 30;
+    animateCouple(currentCouple);
 }
 
 void ofApp::update(){
 	puppet.setScreenOffset(cameraOffset);
-	puppet.update();
     cam.update();
     tracker.update(ofxCv::toCv(cam));
+
+    puppet.update();
     
-	if(cam.isFrameNew() && puppet.getNumControlPoints() > 0) {
-		tracker.update(ofxCv::toCv(cam));
+	if(cam.isFrameNew() && puppet.getNumControlPoints() > 0 && puppetMode) {
         if (tracker.getFound()){
             if (isInit) {
                 for (int i = 0; i < coordFace.size(); i++) {
@@ -128,12 +65,35 @@ void ofApp::update(){
 
 void ofApp::draw(){
 	ofSetColor(255);
-    bgImg.draw(0, 0);
-    //contourImg.draw(0, 0);
+    if (bgImg.isAllocated()) {
+        bgImg.draw(0, 0);
+    }
     
     cam.draw(screenWidth - 300, screenHeight - 190, cam.getWidth() * 0.2, cam.getHeight() * 0.2);
+    
+    if(currentCouple == 0) {
+        ofSetHexColor(0);
+        titleFont.drawString(title, titleXPos, titleYPos);
+        descriptionFont.drawString(artist + " (" + date + "), " + culture, textYPos, artistXPos);
+        descriptionFont.drawString(description, textYPos, descriptionXPos);
+        return;
+    }
+    
     if(!puppetMode){
-        puppetImg.draw(0,0, puppetImg.getWidth(), puppetImg.getHeight());
+        if (puppetImg.isAllocated()) {
+            puppetImg.draw(0,0, puppetImg.getWidth(), puppetImg.getHeight());
+        }
+    } else {
+    	ofSetColor(255);
+        puppetImg.getTextureReference().bind();
+        puppet.drawFaces();
+        puppetImg.getTextureReference().unbind();
+    }
+    
+    if(foreground == "true") {
+        if(fgImg.isAllocated()){
+            fgImg.draw(0,0);        
+        }
     }
 
 	//anim guidelines
@@ -144,10 +104,6 @@ void ofApp::draw(){
 		ofFill();
 	}    
 
-	ofSetColor(255);
-	puppetImg.getTextureReference().bind();
-	puppet.drawFaces();
-	puppetImg.getTextureReference().unbind();
     
 	ofSetColor(128, 24);
 	if(drawMesh)puppet.drawWireframe();
@@ -163,20 +119,6 @@ void ofApp::draw(){
         glPointSize(1);
     }
 
-	//draw mouseover triangle
-	ofSetColor(0,255,255, 64 * fabs(cos(10 * ofGetElapsedTimef())));
-	ofBeginShape();
-		ofVertex(tt.p0.x, tt.p0.y);
-		ofVertex(tt.p1.x, tt.p1.y);
-		ofVertex(tt.p2.x, tt.p2.y);
-	ofEndShape();
-
-	//draw mouseover vertex
-	if(tempVertex.length() > 0.0f){
-		ofSetColor(255,255,0, 128 * fabs(cos(10 * ofGetElapsedTimef())));
-		ofCircle(tempVertex, 5);
-	}
-
 	ofSetupScreen();
     if (!puppetMode) {
         tri.draw();
@@ -188,6 +130,118 @@ void ofApp::draw(){
     descriptionFont.drawString(description, textYPos, descriptionXPos);
 }
 
+void ofApp::animateCouple(int coupleID) {
+    
+    meshFolderName = meshFolderPrefix + static_cast<ostringstream*>( &(ostringstream() << coupleID) )->str();;
+        
+    foreground = "";
+    puppetMode = false;
+    isInit = true;
+    puppet.setEvents(false);
+    
+    indexFace.clear();
+    coordFace.clear();
+    diffFace.clear();
+    
+    vector<int> allPoints = puppet.getControlPointIDs();
+    for (int i = 0; i < allPoints.size(); i++) {
+        puppet.removeControlPoint(allPoints[i]);
+    }
+    
+    tri.triangleMesh.clear();
+    tri.reset();
+
+    bgImg.clear();
+    contourImg.clear();
+    puppetImg.clear();
+    fgImg.clear();
+    
+    xml.loadFile(meshFolderName + "/data.xml");
+    title = ofToUpper(xml.getAttribute("data", "title", ""));
+    date = xml.getAttribute("data", "date", "");
+    artist = xml.getAttribute("data", "artist", "");
+    culture = xml.getAttribute("data", "culture", "");
+    description = xml.getAttribute("data", "description", "");
+    fit = xml.getAttribute("data", "fit", "");
+    fit = xml.getAttribute("data", "fit", "");
+    foreground = xml.getAttribute("data", "foreground", "");
+    
+    if(coupleID == 0) { //Landing page
+        showLandingPage();
+        return;
+    }
+    
+    bgImg.loadImage(meshFolderName + "/bg.jpg");
+    contourImg.loadImage(meshFolderName + "/couple.jpg");
+    puppetImg.loadImage(meshFolderName + "/couple.png");
+        
+    if(foreground == "true") {
+        fgImg.loadImage(meshFolderName + "/fg.png");
+    }
+    
+    if (fit == "width") {
+        float occupyingWidth = 0.75 * screenWidth;
+        
+        if (bgImg.getWidth() > occupyingWidth) {
+            float resizeRatio = occupyingWidth / bgImg.getWidth();
+            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+            if(foreground == "true") {
+                fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
+            }
+        }
+    } else {
+        if (bgImg.getHeight() > screenHeight) {
+            float resizeRatio = screenHeight / bgImg.getHeight();
+            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+            if(foreground == "true") {
+                fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
+            }
+        }
+    }
+    
+    description = wrapText(description, 50);
+    title = wrapText(title, 15);
+        
+    titleXPos = 325;
+    textYPos = 1950;
+    titleBox = titleFont.getStringBoundingBox(title, textYPos, titleXPos);
+    artistXPos = titleXPos + titleBox.height + 35;
+    artistBox = titleFont.getStringBoundingBox(artist + " (" + date + "), " + culture, textYPos, artistXPos);
+    descriptionXPos = artistXPos + artistBox.height + 30;
+}
+
+void ofApp::showLandingPage() {
+    bgImg.clear();
+    bgImg.loadImage(meshFolderName + "/bg.jpg");
+    
+    ofRectangle titleBareBox = titleFont.getStringBoundingBox(title, 0, 0);
+    ofRectangle descriptionBareBox  = titleFont.getStringBoundingBox(description, 0, 0);
+    
+    titleXPos = (screenWidth / 2) - (titleBareBox.width/2);
+    titleYPos = (screenHeight / 2) - (titleBareBox.height/2);
+    
+    artistXPos = titleXPos;
+    artistBox = titleFont.getStringBoundingBox(artist + " (" + date + "), " + culture, textYPos, artistXPos);
+    descriptionXPos = artistXPos + artistBox.height + 30;
+
+}
+
+void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup){
+    triangles.triangleMesh.setMode(OF_PRIMITIVE_LINES);
+    triangles.triangleMesh.enableIndices();
+    triangles.triangleMesh.enableTextures();
+	vector<ofVec3f> verts = triangles.triangleMesh.getVertices();
+	vector<ofVec2f> texCoords;
+	for( int i = 0 ; i < verts.size() ; i++ ){
+		texCoords.push_back(verts[i]);
+	}
+	triangles.triangleMesh.addTexCoords(texCoords);
+	pup.setup(triangles.triangleMesh);
+}
 
 void ofApp::mousePressed( int x, int y, int button ){
     if(puppetMode) return;
@@ -198,6 +252,18 @@ void ofApp::mousePressed( int x, int y, int button ){
             tri.addPoint(x, y, 0);
         }
         if (clicksRecorded == clicksThreshold - 1) {
+            
+            colorImg.allocate(contourImg.getWidth(),contourImg.getHeight());
+            grayImage.allocate(contourImg.getWidth(),contourImg.getHeight());
+            grayBg.allocate(contourImg.getWidth(),contourImg.getHeight());
+            grayDiff.allocate(contourImg.getWidth(),contourImg.getHeight());
+            
+            colorImg.setFromPixels(contourImg.getPixelsRef());
+            grayImage = colorImg; // convert our color image to a grayscale image
+            grayDiff.absDiff(grayBg, grayImage);
+            grayDiff.threshold(100);
+            contourFinder.findContours(grayDiff, 5, (contourImg.getWidth()*contourImg.getHeight())/4, 4, false, false);
+            
             for (int k = 0; k < contourFinder.blobs.size(); k++) {
                 int j = 0;
                 for(int i = 0; i < contourFinder.blobs[k].pts.size() - 3; i = i + 10) {
@@ -306,10 +372,35 @@ void ofApp::keyPressed( int key ){
         } break;
         case 'c' : {
             createMode = true;
-        } break;        
+        } break;
+        case 356 : { // left key
+            currentCouple = ((currentCouple - 1) % totalCouples);
+            if (currentCouple < 0) {
+                currentCouple = currentCouple + totalCouples;
+            }
+            animateCouple(currentCouple);
+            loadAndPuppeteer();
+        } break;
+        case 358 : { // right key
+            currentCouple = (currentCouple + 1) % totalCouples;
+            animateCouple(currentCouple);
+            loadAndPuppeteer();
+        } break;
+        default: {
+        }
     }
 }
 
+void ofApp::loadAndPuppeteer() {
+    /*loadMesh(tri);
+    tri.triangulate(puppetImg);
+    makePuppetFromSelectedTriangleMesh(tri, puppet);
+    puppetMode = true;
+    puppet.setEvents(true);
+    for (int i = 0; i < indexFace.size(); i++){
+        puppet.setControlPoint(indexFace[i]);
+    }*/
+}
 
 void ofApp::saveMesh(ofxDelaunay & t){
     string xmlName = meshFolderName + "/coupleMesh.xml";
@@ -365,14 +456,19 @@ string ofApp::wrapText(string text, int maxChars) {
     
     for (int i = 0; textStream >> word; i++)
     {
-        potentialChars = currentChars + word.size() + 1;
-                
-        if (potentialChars >= maxChars) {
-            wrappedText = wrappedText + "\n" + word + " ";
-            currentChars = word.size() + 1;
+        if (word.size() >= maxChars) {
+            wrappedText = wrappedText + word + "\n";
+            currentChars = 0;
         } else {
-            wrappedText = wrappedText + word + " ";
-            currentChars = potentialChars;
+            potentialChars = currentChars + word.size() + 1;
+            
+            if (potentialChars >= maxChars) {
+                wrappedText = wrappedText + "\n" + word + " ";
+                currentChars = word.size() + 1;
+            } else {
+                wrappedText = wrappedText + word + " ";
+                currentChars = potentialChars;
+            }        
         }
     }
     

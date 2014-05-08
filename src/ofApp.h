@@ -30,19 +30,25 @@ struct TriangleIndexPtrs{
 class ofApp : public ofBaseApp{
 
 public:
-    string meshFolderName = "couple6";
+    int currentCouple = 0;
+    int totalCouples = 11;
+    string meshFolderPrefix = "couple";
+    string meshFolderName;
     
 	void setup();
 	void update();
 	void draw();
 
+    void animateCouple(int coupleID);
+    void showLandingPage();
+    void loadAndPuppeteer();
+    
 	void mousePressed( int x, int y, int button );
 	void mouseMoved( int x, int y );
 	void mouseDragged( int x, int y, int button);
 	void mouseReleased( int x, int y, int button );
 	void keyPressed( int key );
 
-	ofMesh makeGrid(ofRectangle square, int nHoriz, int nVert);
     void makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup);
     void saveMesh(ofxDelaunay & points);
 	void loadMesh(ofxDelaunay & points);
@@ -54,6 +60,8 @@ public:
     ofImage bgImg;
 	ofImage puppetImg;
 	ofImage contourImg;
+    ofImage fgImg;
+
 	Triangle tt; //temp triangle to draw mouseOver
 	ofVec2f tempVertex;
 	int mouseOverVertexIndex; //index of the vertex that we are mouseOvering on, otherwise -1
@@ -81,25 +89,7 @@ public:
     vector<int>     indexFace;
     vector<ofPoint> coordFace;    
     vector<ofPoint> diffFace;
-    
-    vector<ofPoint> puppetTorso;
-    vector<ofPoint> puppetLeftArm;
-    vector<ofPoint> puppetRightArm;
-    vector<ofPoint> puppetPotato;
-    
-    int count = 0;
-    float avgHue = 0;
-    float avgBri = 0;
-    float avgLight = 0;
-    float avgTopColorR = 0;
-    float avgTopColorB = 0;
-    float avgTopColorG = 0;
-    ofColor avgTopColor;
-    
-    float noseHue = 0;
-    float noseBri = 0;
-    float noseLight = 0;
-    
+        
     ofxCvColorImage	colorImg;
     ofxCvGrayscaleImage grayImage;
     ofxCvGrayscaleImage grayBg;
@@ -107,22 +97,23 @@ public:
     ofxCvContourFinder contourFinder;
     
     int clicksThreshold = 24;
-    int threshold;
     
     ofTrueTypeFont titleFont;
     ofTrueTypeFont descriptionFont;
     
     ofxXmlSettings xml;
-    string title;
-    string date;
-    string artist;
-    string culture;
-    string description;
-    string fit;
+    string title = "";
+    string date = "";
+    string artist = "";
+    string culture = "";
+    string description = "";
+    string fit = "";
+    string foreground = "";
     
     bool fitByHeight;
     
     int titleXPos;
+    int titleYPos;
     int textYPos;
     int artistXPos;
     int descriptionXPos;
