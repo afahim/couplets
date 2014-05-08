@@ -74,8 +74,7 @@ void ofApp::draw(){
     if(currentCouple == 0) {
         ofSetHexColor(0);
         titleFont.drawString(title, titleXPos, titleYPos);
-        descriptionFont.drawString(artist + " (" + date + "), " + culture, textYPos, artistXPos);
-        descriptionFont.drawString(description, textYPos, descriptionXPos);
+        descriptionFont.drawString(description, descriptionXPos, titleYPos + 100);
         return;
     }
     
@@ -219,14 +218,13 @@ void ofApp::showLandingPage() {
     bgImg.loadImage(meshFolderName + "/bg.jpg");
     
     ofRectangle titleBareBox = titleFont.getStringBoundingBox(title, 0, 0);
-    ofRectangle descriptionBareBox  = titleFont.getStringBoundingBox(description, 0, 0);
+    ofRectangle descriptionBareBox  = descriptionFont.getStringBoundingBox(description, 0, 0);
     
     titleXPos = (screenWidth / 2) - (titleBareBox.width/2);
     titleYPos = (screenHeight / 2) - (titleBareBox.height/2);
     
-    artistXPos = titleXPos;
-    artistBox = titleFont.getStringBoundingBox(artist + " (" + date + "), " + culture, textYPos, artistXPos);
-    descriptionXPos = artistXPos + artistBox.height + 30;
+    descriptionXPos = (screenWidth / 2) - (descriptionBareBox.width/2);
+    
 
 }
 
@@ -374,17 +372,17 @@ void ofApp::keyPressed( int key ){
             createMode = true;
         } break;
         case 356 : { // left key
-            currentCouple = ((currentCouple - 1) % totalCouples);
-            if (currentCouple < 0) {
-                currentCouple = currentCouple + totalCouples;
-            }
-            animateCouple(currentCouple);
-            loadAndPuppeteer();
+                currentCouple = ((currentCouple - 1) % totalCouples);
+                if (currentCouple < 0) {
+                    currentCouple = currentCouple + totalCouples;
+                }
+                animateCouple(currentCouple);
+                loadAndPuppeteer();
         } break;
         case 358 : { // right key
-            currentCouple = (currentCouple + 1) % totalCouples;
-            animateCouple(currentCouple);
-            loadAndPuppeteer();
+                currentCouple = (currentCouple + 1) % totalCouples;
+                animateCouple(currentCouple);
+                loadAndPuppeteer();
         } break;
         default: {
         }

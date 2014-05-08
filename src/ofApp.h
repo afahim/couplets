@@ -31,7 +31,7 @@ class ofApp : public ofBaseApp{
 
 public:
     int currentCouple = 0;
-    int totalCouples = 11;
+    int totalCouples = 13;
     string meshFolderPrefix = "couple";
     string meshFolderName;
     
@@ -120,4 +120,8 @@ public:
 
     ofRectangle titleBox;
     ofRectangle artistBox;
+    
+    int currentVolumeUps = 0;
+    int currentVolumeDowns = 0;
+    int volumeThresh = 10;
 };
