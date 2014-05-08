@@ -4,6 +4,61 @@ void ofApp::setup(){
     screenWidth = ofGetWindowSize().x;
     screenHeight = ofGetWindowSize().y;
     
+    for (int i = 0; i < totalCouples; i++) {
+        currentCouple = i;
+        meshFolderName = meshFolderPrefix + static_cast<ostringstream*>( &(ostringstream() << currentCouple) )->str();;
+        bgImg.clear();
+        contourImg.clear();
+        puppetImg.clear();
+        
+        xml.loadFile(meshFolderName + "/data.xml");
+        fit = xml.getAttribute("data", "fit", "");
+        foreground = xml.getAttribute("data", "foreground", "");
+
+        bgImg.loadImage(meshFolderName + "/bg.jpg");
+        contourImg.loadImage(meshFolderName + "/couple.jpg");
+        puppetImg.loadImage(meshFolderName + "/couple.png");
+
+        if(foreground == "true") {
+            fgImg.loadImage(meshFolderName + "/fg.png");
+        }
+        
+        if (fit == "width") {
+            float occupyingWidth;
+            if (currentCouple == 0 || currentCouple == 1) {
+                occupyingWidth = screenWidth;
+            } else {
+                occupyingWidth = 0.75 * screenWidth;
+            }
+            
+            if (bgImg.getWidth() > occupyingWidth) {
+                float resizeRatio = occupyingWidth / bgImg.getWidth();
+                bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+                contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+                puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+                if(foreground == "true") {
+                    fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
+                }
+            }
+        } else {
+            if (bgImg.getHeight() > screenHeight) {
+                float resizeRatio = screenHeight / bgImg.getHeight();
+                bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
+                contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
+                puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
+                if(foreground == "true") {
+                    fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
+                }
+            }
+        }
+        
+        allBgs.push_back(bgImg);
+        allContours.push_back(contourImg);
+        allPuppets.push_back(puppetImg);
+    }
+    
+    currentCouple = 0;
+    
     ofBackground(255, 227, 191);
 	ofSetVerticalSync(true);
 	puppet.setEvents(false);
@@ -74,7 +129,10 @@ void ofApp::draw(){
     if(currentCouple == 0) {
         ofSetHexColor(0);
         titleFont.drawString(title, titleXPos, titleYPos);
-        descriptionFont.drawString(description, descriptionXPos, titleYPos + 100);
+        descriptionFont.drawString(artist, artistXPos, titleYPos + 100);
+
+        descriptionFont.drawString(description, descriptionXPos, titleYPos + 200);
+        descriptionFont.drawString(description2, description2XPos, titleYPos + 230);
         return;
     }
     
@@ -104,7 +162,7 @@ void ofApp::draw(){
 	}    
 
     
-	ofSetColor(128, 24);
+	/*ofSetColor(128, 24);
 	if(drawMesh)puppet.drawWireframe();
 	if(drawIDs)puppet.drawVertexIDs();
 	if(drawCtrlpoints)puppet.drawControlPoints();
@@ -116,7 +174,7 @@ void ofApp::draw(){
         glPointSize(3);
         tri.triangleMesh.draw(OF_MESH_POINTS);
         glPointSize(1);
-    }
+    }*/
 
 	ofSetupScreen();
     if (!puppetMode) {
@@ -147,13 +205,9 @@ void ofApp::animateCouple(int coupleID) {
         puppet.removeControlPoint(allPoints[i]);
     }
     
-    tri.triangleMesh.clear();
-    tri.reset();
-
     bgImg.clear();
     contourImg.clear();
     puppetImg.clear();
-    fgImg.clear();
     
     xml.loadFile(meshFolderName + "/data.xml");
     title = ofToUpper(xml.getAttribute("data", "title", ""));
@@ -161,47 +215,19 @@ void ofApp::animateCouple(int coupleID) {
     artist = xml.getAttribute("data", "artist", "");
     culture = xml.getAttribute("data", "culture", "");
     description = xml.getAttribute("data", "description", "");
-    fit = xml.getAttribute("data", "fit", "");
-    fit = xml.getAttribute("data", "fit", "");
     foreground = xml.getAttribute("data", "foreground", "");
+
+    
+    bgImg = allBgs[currentCouple];
     
     if(coupleID == 0) { //Landing page
         showLandingPage();
         return;
     }
     
-    bgImg.loadImage(meshFolderName + "/bg.jpg");
-    contourImg.loadImage(meshFolderName + "/couple.jpg");
-    puppetImg.loadImage(meshFolderName + "/couple.png");
-        
-    if(foreground == "true") {
-        fgImg.loadImage(meshFolderName + "/fg.png");
-    }
-    
-    if (fit == "width") {
-        float occupyingWidth = 0.75 * screenWidth;
-        
-        if (bgImg.getWidth() > occupyingWidth) {
-            float resizeRatio = occupyingWidth / bgImg.getWidth();
-            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
-            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
-            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
-            if(foreground == "true") {
-                fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
-            }
-        }
-    } else {
-        if (bgImg.getHeight() > screenHeight) {
-            float resizeRatio = screenHeight / bgImg.getHeight();
-            bgImg.resize(bgImg.getWidth() * resizeRatio, bgImg.getHeight() * resizeRatio);
-            contourImg.resize(contourImg.getWidth() * resizeRatio, contourImg.getHeight() * resizeRatio);
-            puppetImg.resize(puppetImg.getWidth() * resizeRatio, puppetImg.getHeight() * resizeRatio);
-            if(foreground == "true") {
-                fgImg.resize(fgImg.getWidth() * resizeRatio, fgImg.getHeight() * resizeRatio);
-            }
-        }
-    }
-    
+    contourImg = allContours[currentCouple];
+    puppetImg = allPuppets[currentCouple];
+
     description = wrapText(description, 50);
     title = wrapText(title, 15);
         
@@ -214,18 +240,21 @@ void ofApp::animateCouple(int coupleID) {
 }
 
 void ofApp::showLandingPage() {
-    bgImg.clear();
-    bgImg.loadImage(meshFolderName + "/bg.jpg");
     
+    description2 = xml.getAttribute("data", "description2", "");
+        
     ofRectangle titleBareBox = titleFont.getStringBoundingBox(title, 0, 0);
+    ofRectangle artistBareBox  = descriptionFont.getStringBoundingBox(artist, 0, 0);
     ofRectangle descriptionBareBox  = descriptionFont.getStringBoundingBox(description, 0, 0);
-    
+    ofRectangle description2BareBox  = descriptionFont.getStringBoundingBox(description2, 0, 0);
+
     titleXPos = (screenWidth / 2) - (titleBareBox.width/2);
     titleYPos = (screenHeight / 2) - (titleBareBox.height/2);
     
-    descriptionXPos = (screenWidth / 2) - (descriptionBareBox.width/2);
+    artistXPos = (screenWidth / 2) - (artistBareBox.width/2);
     
-
+    descriptionXPos = (screenWidth / 2) - (descriptionBareBox.width/2);
+    description2XPos = (screenWidth / 2) - (description2BareBox.width/2);
 }
 
 void ofApp::makePuppetFromSelectedTriangleMesh(ofxDelaunay & triangles, ofxPuppetInteractive & pup){
@@ -371,18 +400,21 @@ void ofApp::keyPressed( int key ){
         case 'c' : {
             createMode = true;
         } break;
+        case 'g' : {
+            loadAndPuppeteer();
+        } break;
         case 356 : { // left key
                 currentCouple = ((currentCouple - 1) % totalCouples);
                 if (currentCouple < 0) {
                     currentCouple = currentCouple + totalCouples;
                 }
                 animateCouple(currentCouple);
-                loadAndPuppeteer();
+                //loadAndPuppeteer();
         } break;
         case 358 : { // right key
                 currentCouple = (currentCouple + 1) % totalCouples;
                 animateCouple(currentCouple);
-                loadAndPuppeteer();
+                //loadAndPuppeteer();
         } break;
         default: {
         }
@@ -390,14 +422,14 @@ void ofApp::keyPressed( int key ){
 }
 
 void ofApp::loadAndPuppeteer() {
-    /*loadMesh(tri);
+    loadMesh(tri);
     tri.triangulate(puppetImg);
     makePuppetFromSelectedTriangleMesh(tri, puppet);
     puppetMode = true;
     puppet.setEvents(true);
     for (int i = 0; i < indexFace.size(); i++){
         puppet.setControlPoint(indexFace[i]);
-    }*/
+    }
 }
 
 void ofApp::saveMesh(ofxDelaunay & t){

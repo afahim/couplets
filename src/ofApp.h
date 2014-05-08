@@ -31,7 +31,7 @@ class ofApp : public ofBaseApp{
 
 public:
     int currentCouple = 0;
-    int totalCouples = 13;
+    int totalCouples = 15;
     string meshFolderPrefix = "couple";
     string meshFolderName;
     
@@ -56,6 +56,10 @@ public:
 
 	ofxPuppetInteractive puppet;
 	ofxDelaunay tri;
+    
+    vector<ofImage> allBgs;
+    vector<ofImage> allContours;
+    vector<ofImage> allPuppets;
 
     ofImage bgImg;
 	ofImage puppetImg;
@@ -109,6 +113,7 @@ public:
     string description = "";
     string fit = "";
     string foreground = "";
+    string description2 = "";
     
     bool fitByHeight;
     
@@ -117,6 +122,7 @@ public:
     int textYPos;
     int artistXPos;
     int descriptionXPos;
+    int description2XPos;
 
     ofRectangle titleBox;
     ofRectangle artistBox;
